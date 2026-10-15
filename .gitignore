@@ -1,0 +1,4 @@
+*.txt
+*.clangd
+test
+test.c
