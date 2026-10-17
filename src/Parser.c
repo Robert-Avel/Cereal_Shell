@@ -5,7 +5,7 @@
 enum Status {
     SUCCESS,
     FAIL,
-    WHITESPACE_EXPECTED,
+    WHITESPACE_OR_SEMICOLON_EXPECTED,
 };
 
 struct Parser* Parser_new() {
@@ -34,26 +34,4 @@ int Parser_end(struct Parser* p) {
     ArgList_end(p->argl);
     free(p);
     return SUCCESS;
-}
-
-
-int Parser_stepMainCommand(struct Parser* p) {
-    if(p->cursor != 0) {return FAIL;}
-    char buffer[100];
-
-
-    for(size_t i = 0; ;i++) {
-        buffer[i] = Parser_stepChar(p);
-        if (buffer[i] == '\0' || buffer[i] == ' ') {
-            break;
-        }
-    }
-
-}
-
-
-
-int Parser_start(struct Parser* p) {
-    if(p->commad == NULL) {return 1;}
-    Parser_stepMainCommand(p);
 }

@@ -99,6 +99,40 @@ int ArgList_append(struct ArgList* ab, const struct ArgToken* at) {
     return SUCESS;
 }
 
+int ArgList_appendPosArg(struct ArgList* ab, const struct PosArg* pa) {
+    struct ArgToken at = {
+        .arg.pa = *pa,
+        .type = POSITIONAL
+    };
+    return ArgList_append(ab, &at);
+}
+
+int ArgList_appendManualPosArg(struct ArgList* ab, const char* arg, size_t pos) {
+    struct PosArg pa = {
+        .pos = pos,
+        .value = arg
+    };
+    return ArgList_appendPosArg(ab, &pa);
+}
+
+
+int ArgList_appendKeyArg(struct ArgList* ab, const struct KeyArg* ka) {
+    struct ArgToken at = {
+        .arg.ka = *ka,
+        .type = KEY
+    };
+    return ArgList_append(ab, &at);
+}
+
+int ArgList_appendManualKeyArg(struct ArgList* ab, const char* arg, const char* key) {
+    struct KeyArg ka = {
+        .key = key,
+        .value = arg
+    };
+    return ArgList_appendKeyArg(ab, &ka);
+}
+
+
 int ArgList_remove(struct ArgList* ab, size_t index) {
     if(ab == NULL) {return INVALID_INPUT;}
     if(index < 0 || index >= ab->size) {return OUT_OF_RANGE;}
@@ -111,19 +145,19 @@ int ArgList_remove(struct ArgList* ab, size_t index) {
 }
 
 void ArgListIterator_init(struct ArgListIterator* ali, const struct ArgList* al) {
-    ali->head = al->head;
-    ali->cursor = al->head;
+    ali->_head = al->head;
+    ali->iterator = al->head;
 }
 
 
 int ArgListIterator_jump(struct ArgListIterator* ali) {
     if(ali == NULL) {return INVALID_INPUT;}
-    if(ali->cursor->next_node == NULL) {
-        ali->cursor = ali->head;
+    if(ali->iterator->next_node == NULL) {
+        ali->iterator = ali->_head;
         return TURN_AROUND;
     }
     else {
-        ali->cursor = ali->cursor->next_node;
+        ali->iterator = ali->iterator->next_node;
         return SUCESS;
     }
 }
