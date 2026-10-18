@@ -1,3 +1,6 @@
+#ifndef ARGTOKEM_HPP
+#define ARGTOKEM_HPP
+
 #include <stdlib.h>
 
 typedef enum {
@@ -39,3 +42,5 @@ struct KeyArg* ArgToken_setKeyArgSized(struct ArgToken* at, const char* key, siz
 
 const struct PosArg* ArgToken_getPosArg(const struct ArgToken* at);
 const struct KeyArg* ArgToken_getKeyArg(const struct ArgToken* at);
+
+#endif

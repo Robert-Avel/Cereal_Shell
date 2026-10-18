@@ -15,6 +15,17 @@ struct PosArg* ArgToken_setPosArg(struct ArgToken* at, int pos, const char* valu
 }
 
 struct PosArg* ArgToken_setPosArgSized(struct ArgToken* at, int pos, const char* value, size_t value_size) {
+    if(at == NULL) {return NULL;}
+    switch (at->type) {
+        case POSITIONAL:
+            free( (void*) at->arg.pa.value);
+            break;
+        case KEY:
+            free( (void*) at->arg.ka.key);
+            free( (void*) at->arg.ka.value);
+        case NONE:
+            break;
+    }
     char* buf = malloc(sizeof(char) * value_size + 1);
     strncpy(buf, value, value_size);
     buf[value_size] = '\0';
@@ -26,6 +37,16 @@ struct PosArg* ArgToken_setPosArgSized(struct ArgToken* at, int pos, const char*
 
 struct KeyArg* ArgToken_setKeyArg(struct ArgToken* at, const char* key, const char* value) {
     if(at == NULL) {return NULL;}
+    switch (at->type) {
+        case POSITIONAL:
+            free( (void*) at->arg.pa.value);
+            break;
+        case KEY:
+            free( (void*) at->arg.ka.key);
+            free( (void*) at->arg.ka.value);
+        case NONE:
+            break;
+    }
 
     at->type = KEY;
 

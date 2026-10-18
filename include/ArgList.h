@@ -1,3 +1,7 @@
+#ifndef ARGLIST_HPP
+#define ARGLIST_HPP
+
+
 #include "ArgToken.h"
 #include <stddef.h>
 
@@ -6,7 +10,7 @@
 
 struct _ArgListNode {
     struct _ArgListNode* next_node;
-    struct ArgToken at;
+    struct ArgToken* at;
 };
 
 struct ArgListIterator {
@@ -42,3 +46,5 @@ int ArgList_remove(struct ArgList* ab, size_t index);
 
 void ArgListIterator_init(struct ArgListIterator* ali, const struct ArgList* al);
 int ArgListIterator_jump(struct ArgListIterator* ali);
+
+#endif

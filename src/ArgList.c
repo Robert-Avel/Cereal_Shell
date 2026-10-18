@@ -1,6 +1,8 @@
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "ArgList.h"
+#include "ArgToken.h"
 
 enum Status {
   SUCESS = 0,
@@ -32,7 +34,16 @@ struct _ArgListNode* _ArgListNode_new(const struct ArgToken* at) {
     struct _ArgListNode* alb = malloc(sizeof(struct _ArgListNode));
     if(alb == NULL) {return NULL;}
     alb->next_node = NULL;
-    alb->at = *at;
+    alb->at = ArgToken_new();
+    switch (at->type) {
+        case POSITIONAL:
+            ArgToken_setPosArg(alb->at, at->arg.pa.pos, at->arg.pa.value);
+            break;
+        case KEY:
+            ArgToken_setKeyArg(alb->at, at->arg.ka.key, at->arg.ka.value);
+        case NONE:
+            break;
+    }
     return alb;
 }
 
@@ -40,6 +51,7 @@ struct _ArgListNode* _ArgListNode_new(const struct ArgToken* at) {
 struct _ArgListNode* _ArgListNode_end(struct _ArgListNode* aln) {
     if(aln == NULL) {return NULL;}
     struct _ArgListNode* ret = aln->next_node;
+    ArgToken_end(aln->at);
     free(aln);
     return ret;
 }
@@ -63,7 +75,7 @@ const struct ArgToken* ArgList_getArg(struct ArgList* al, size_t index) {
     const struct _ArgListNode* node = _ArgList_getNode(al->head, index);
     if(node == NULL) {return NULL;}
 
-    return &node->at;
+    return node->at;
 }
 
 
@@ -96,6 +108,7 @@ int ArgList_append(struct ArgList* ab, const struct ArgToken* at) {
         last_node->next_node = n_node;
     }
     ab->size += 1;
+
     return SUCESS;
 }
 
