@@ -2,7 +2,6 @@
 #define PARSER_HPP
 
 #include <stddef.h>
-#include <stdlib.h>
 #include <stdbool.h>
 #include "ArgList.h"
 #include "StrArray.h"
@@ -18,13 +17,12 @@ struct Parser {
 };
 
 
-
-
 struct Parser* Parser_new();
 
 int Parser_setCmd(struct Parser* p, const char* cmd);
 int Parser_slip(struct Parser* p);
 int Parser_makeArgs(struct Parser* p);
+int Parser_analyzeArg(struct Parser* p);
 
 int Parser_end(struct Parser* p);
 

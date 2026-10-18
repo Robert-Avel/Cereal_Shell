@@ -5,13 +5,14 @@
 #include <sys/types.h>
 #include "Parser.h"
 #include "ArgList.h"
+#include "ArgToken.h"
 #include "StrArray.h"
 #include <stdio.h>
 
 enum Status {
     SUCCESS,
     FAIL,
-    WHITESPACE_OR_SEMICOLON_EXPECTED,
+    CRITICAL,
 };
 
 struct Parser* Parser_new() {
@@ -59,7 +60,7 @@ int Parser_makeArgs(struct Parser* p) {
 
     for (int i = 0; i < p->stra->size; i++) {
         if(str_arr[i][0] == ARG_PREFIX) {
-            if(str_arr[i + 1] == NULL) {return 1;}
+            if(str_arr[i + 1] == NULL) {return FAIL;}
             ArgList_appendManualKeyArg(p->argl, str_arr[i+1], str_arr[i]);
             i++;
         }
@@ -71,6 +72,25 @@ int Parser_makeArgs(struct Parser* p) {
     StrArray_end(p->stra);
     p->stra = NULL;
     return 0;
+}
+
+
+int Parser_analyzeArg(struct Parser* p) {
+    if(p == NULL) {return FAIL;}
+    struct ArgListIterator ali = {0};
+    ArgListIterator_init(&ali, p->argl);
+
+    bool only_keys = false;
+    do { //Checa argumentos posicionais depois de argumentos nomeados
+        if(ali.iterator->at->type == KEY) {
+            only_keys = true;
+        }
+        if(ali.iterator->at->type == POSITIONAL && only_keys) {
+            Parser_end(p);
+            return CRITICAL;
+        }
+    } while(ArgListIterator_jump(&ali) != 5);
+    return SUCCESS;
 }
 
 
