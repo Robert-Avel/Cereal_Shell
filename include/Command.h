@@ -1,18 +1,13 @@
-#define MAKE_FUNC_PTR(RETURN_TYPE, NAME, ARGS_TYPES...) \
-    RETURN_TYPE (*NAME) (ARGS_TYPES)
+#include <stddef.h>
+
+#define MAKE_FUNC_TYPE(RETURN_TYPE, NAME, ARGS_TYPES...) \
+    typedef RETURN_TYPE (*NAME) (ARGS_TYPES);
 
 
-#define MAKE_COMMAND(RETURN_TYPE, NAME, ARGS_TYPES...) \
-    struct { \
-        const char* name; \
-        MAKE_FUNC_PTR(RETURN_TYPE, func, ARGS_TYPES); \
-    } NAME;
+typedef void* (*PreCommand) (const char*, size_t) ;
 
-#define CONSTRUCT_INIT_FUUNC(RETURN_TYPE, NAME, FUNCTION_NAME, ARGS_TYPES...) \
-    void init() { \
-        NAME .name = NAME_MAX; \
-        NAME .func = &FUNCTION_NAME; \
-    }
 
-CONSTRUCT(int, sum, somar, int);
-CONSTRUCT(void, ok, okBro);
+struct CmdArray {
+    PreCommand* cmds;
+    size_t size;
+};
