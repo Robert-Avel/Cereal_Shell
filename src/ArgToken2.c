@@ -26,11 +26,11 @@ int NArgToken_resetKey(struct NArgToken* nat) {
     return 0;
 }
 
-int NArgToken_setKey(struct NArgToken* nat, const void* key, enum KeyType kt) {
+int NArgToken_setKey(struct NArgToken* nat, enum KeyType kt, const void* key) {
     if (nat == NULL) {return 2;}
     NArgToken_resetKey(nat);
 
-    switch (nat->key_type) {
+    switch (kt) {
         case NAMED:
             nat->key.named = strdup((const char*) key);
             break;
@@ -45,6 +45,38 @@ int NArgToken_setKey(struct NArgToken* nat, const void* key, enum KeyType kt) {
     return 0;
 }
 
+int NArgToken_setConvertKey(struct NArgToken* nat, enum KeyType kt, const char* key) {
+    if (nat == NULL) {return 2;}
+    const char* tmp = strdup(key);
+    if(tmp == NULL) {return 3;}
+
+    NArgToken_resetKey(nat);
+    switch (kt) {
+        case NAMED:
+            nat->key.named = tmp;
+            break;
+        case POSITIONAL:
+            nat->key.pos = (unsigned int) strtoul(tmp, NULL, 10);
+            break;
+        case NONE:
+        default:
+            return 1;
+    }
+
+    if (kt != NAMED) {free( (void*) tmp);}
+    nat->key_type = kt;
+    return 0;
+}
+
+const char** NArgToken_getKeyNamed(struct NArgToken* nat) {
+    if(nat == NULL || nat->key_type != NAMED) {return NULL;} \
+    return &nat->key.named;
+}
+position* NArgToken_getKeyPositional(struct NArgToken* nat) {
+    if(nat == NULL || nat->key_type != POSITIONAL) {return NULL;} \
+    return &nat->key.pos;
+}
+
 int NArgToken_resetArg(struct NArgToken* nat) {
     if (nat == NULL) {return 2;}
     if (nat->arg_type == VOID) {return 1;}
@@ -55,7 +87,7 @@ int NArgToken_resetArg(struct NArgToken* nat) {
 }
 
 
-int NArgToken_setArg(struct NArgToken* nat, const void* arg, enum DataType at) {
+int NArgToken_setArg(struct NArgToken* nat, enum DataType at, const void* arg) {
     if (nat == NULL) {return 2;}
     NArgToken_resetArg(nat);
 
@@ -94,7 +126,7 @@ int NArgToken_setArg(struct NArgToken* nat, const void* arg, enum DataType at) {
     nat->arg_type = at;
     return 0;
 }
-int NArgToken_convertArg(struct NArgToken* nat, const char* arg, enum DataType at) {
+int NArgToken_setConvertArg(struct NArgToken* nat, enum DataType at, const char* arg) {
     if (nat == NULL) {return 2;}
     const char* tmp = strdup(arg);
     if(tmp == NULL) {return 3;}
@@ -133,7 +165,25 @@ int NArgToken_convertArg(struct NArgToken* nat, const char* arg, enum DataType a
             return 1;
     }
     if (at != STRING) {free( (void*) tmp);}
+    nat->arg_type = at;
     return 0;
+}
+
+int NArgToken_setAllConvert(struct NArgToken* nat, enum KeyType kt, const char* key, enum DataType at, const char* arg) {
+    int i = NArgToken_setConvertKey(nat, kt, key);
+    if(i != 0) {return i;}
+    i = NArgToken_setConvertArg(nat, at, arg);
+    return i;
+}
+
+
+struct NArgToken* NArgToken_newConstruct(enum KeyType kt, const char* key, enum DataType at, const char* arg) {
+    struct NArgToken* nat = NArgToken_new();
+
+    NArgToken_setConvertKey(nat, kt, key);
+    NArgToken_setConvertArg(nat, at, arg);
+
+    return nat;
 }
 
 

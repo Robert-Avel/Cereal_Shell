@@ -5,7 +5,7 @@
 #include <sys/types.h>
 #include "Parser.h"
 #include "ArgList.h"
-#include "ArgToken.h"
+#include "ArgToken2.h"
 #include "StrArray.h"
 #include <stdio.h>
 
@@ -58,17 +58,21 @@ int Parser_makeArgs(struct Parser* p) {
 
     const char** str_arr = p->stra->array;
 
+    char temp_char[16] = {0};
     for (int i = 0; i < p->stra->size; i++) {
         if(str_arr[i][0] == ARG_PREFIX) {
             if(str_arr[i + 1] == NULL) {return FAIL;}
-            ArgList_appendManualKeyArg(p->argl, str_arr[i+1], str_arr[i]);
+            ArgList_appendManual(p->argl, NAMED, str_arr[i], STRING, str_arr[i+1]);
             i++;
         }
         else {
-            ArgList_appendManualPosArg(p->argl, str_arr[i], i);
+            sprintf(temp_char, "%d", i);
+            ArgList_appendManual(p->argl, POSITIONAL, temp_char, STRING, str_arr[i]);
         }
+
         continue;
     }
+
     StrArray_end(p->stra);
     p->stra = NULL;
     return 0;
@@ -82,10 +86,10 @@ int Parser_analyzeArg(struct Parser* p) {
 
     bool only_keys = false;
     do { //Checa argumentos posicionais depois de argumentos nomeados
-        if(ali.iterator->at->type == KEY) {
+        if(ali.iterator->at->key_type == NAMED) {
             only_keys = true;
         }
-        if(ali.iterator->at->type == POSITIONAL && only_keys) {
+        if(ali.iterator->at->key_type == POSITIONAL && only_keys) {
             Parser_end(p);
             return CRITICAL;
         }

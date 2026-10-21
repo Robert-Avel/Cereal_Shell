@@ -1,8 +1,11 @@
+#ifndef NARGTOKEM_HPP
+#define NARGTOKEM_HPP
+
 #include <stdbool.h>
 #include <stdlib.h>
 
 #define _SET_ARG_SIGN(type, func_ext)                                \
-    type* NArgToken_getArg##func_ext (struct NArgToken* nat)
+    type* NArgToken_getArg_##func_ext (struct NArgToken* nat)
 
 
 #define _SET_ARG_BODY(type, enum_type, union_var)                    \
@@ -61,19 +64,23 @@ struct NArgToken {
 };
 
 
-
 struct NArgToken* NArgToken_new();
 
 int NArgToken_resetKey(struct NArgToken* nat);
-int NArgToken_setKey(struct NArgToken* nat, const void* key, enum KeyType kt);
+int NArgToken_setKey(struct NArgToken* nat, enum KeyType kt, const void* key);
+int NArgToken_setConvertKey(struct NArgToken* nat, enum KeyType kt, const char* key);
 
-const char* NArgToken_getKeyNamed(struct NArgToken* nat);
-position NArgToken_getKeyPositional(struct NArgToken* nat);
+const char** NArgToken_getKeyNamed(struct NArgToken* nat);
+position* NArgToken_getKeyPositional(struct NArgToken* nat);
 
 int NArgToken_resetArg(struct NArgToken* nat);
-int NArgToken_setArg(struct NArgToken* nat, const void* arg, enum DataType at);
-int NArgToken_setConvertArg(struct NArgToken* nat, const char* arg, enum DataType at);
+int NArgToken_setArg(struct NArgToken* nat, enum DataType at, const void* arg);
+int NArgToken_setConvertArg(struct NArgToken* nat, enum DataType at, const char* arg);
 
+
+int NArgToken_setAllConvert(struct NArgToken* nat, enum KeyType kt, const char* key, enum DataType at, const char* arg);
+
+struct NArgToken* NArgToken_newConstruct(enum KeyType kt, const char* key, enum DataType at, const char* arg);
 int NArgToken_end(struct NArgToken* nat);
 
 
@@ -87,3 +94,5 @@ _SET_ARG_SIGN(unsigned long,      ul);
 _SET_ARG_SIGN(unsigned long long, ull);
 _SET_ARG_SIGN(const char*,        cc);
 _SET_ARG_SIGN(bool,               b);
+
+#endif

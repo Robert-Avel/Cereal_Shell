@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "ArgList.h"
-#include "ArgToken.h"
+#include "ArgToken2.h"
+
 
 enum Status {
   SUCESS = 0,
@@ -13,47 +14,24 @@ enum Status {
   TURN_AROUND
 };
 
-struct ArgList* ArgList_new() {
-    struct ArgList* ab = (struct ArgList*) malloc(sizeof(struct ArgList));
-    if(ab == NULL) {return NULL;}
-
-    ab->head = NULL;
-    ab->size = 0;
-    return ab;
-}
-
-int ArgList_end(struct ArgList* ab) {
-    if(ab == NULL) {return INVALID_INPUT;}
-
-    free(ab->head);
-    free(ab);
-    return SUCESS;
-}
-
-struct _ArgListNode* _ArgListNode_new(const struct ArgToken* at) {
+struct _ArgListNode* _ArgListNode_new(const struct NArgToken* nat) {
     struct _ArgListNode* alb = malloc(sizeof(struct _ArgListNode));
     if(alb == NULL) {return NULL;}
+
     alb->next_node = NULL;
-    alb->at = ArgToken_new();
-    switch (at->type) {
-        case POSITIONAL:
-            ArgToken_setPosArg(alb->at, at->arg.pa.pos, at->arg.pa.value);
-            break;
-        case KEY:
-            ArgToken_setKeyArg(alb->at, at->arg.ka.key, at->arg.ka.value);
-        case NONE:
-            break;
-    }
+    alb->at = NArgToken_new();
+    NArgToken_setConvertKey(alb->at, nat->key_type, nat->key.named);
+    NArgToken_setConvertArg(alb->at, nat->arg_type, nat->arg.cc);
     return alb;
 }
 
 
 struct _ArgListNode* _ArgListNode_end(struct _ArgListNode* aln) {
     if(aln == NULL) {return NULL;}
-    struct _ArgListNode* ret = aln->next_node;
-    ArgToken_end(aln->at);
+    struct _ArgListNode* next_node = aln->next_node;
+    NArgToken_end(aln->at);
     free(aln);
-    return ret;
+    return next_node;
 }
 
 
@@ -68,7 +46,36 @@ struct _ArgListNode* _ArgList_getNode(struct _ArgListNode* ald, size_t index) {
 }
 
 
-const struct ArgToken* ArgList_getArg(struct ArgList* al, size_t index) {
+int _ArgListNode_endRecursive(struct _ArgListNode* head, size_t index) {
+    if(head == NULL) {return FAIL;}
+
+    if(index <= 0) {
+        return SUCESS;
+    } else {
+        return _ArgListNode_endRecursive(_ArgListNode_end(head), index -1);
+    }
+}
+
+
+struct ArgList* ArgList_new() {
+    struct ArgList* ab = (struct ArgList*) malloc(sizeof(struct ArgList));
+    if(ab == NULL) {return NULL;}
+
+    ab->head = NULL;
+    ab->size = 0;
+    return ab;
+}
+
+int ArgList_end(struct ArgList* ab) {
+    if(ab == NULL) {return INVALID_INPUT;}
+
+    _ArgListNode_endRecursive(ab->head, ab->size);
+    free(ab);
+    return SUCESS;
+}
+
+
+const struct NArgToken* ArgList_getArg(struct ArgList* al, size_t index) {
     if(al == NULL) {return NULL;}
     if(index > al->size) {return NULL;}
 
@@ -79,20 +86,9 @@ const struct ArgToken* ArgList_getArg(struct ArgList* al, size_t index) {
 }
 
 
-const struct PosArg* ArgList_getPosArg(struct ArgList* al, size_t index) {
-    const struct ArgToken* at = ArgList_getArg(al, index);
-    return ArgToken_getPosArg(at);
-}
 
-
-const struct KeyArg* ArgList_getKeyArg(struct ArgList* al, size_t index) {
-    const struct ArgToken* at = ArgList_getArg(al, index);
-    return ArgToken_getKeyArg(at);
-}
-
-
-int ArgList_append(struct ArgList* ab, const struct ArgToken* at) {
-    if(ab == NULL) {return INVALID_INPUT;}
+int ArgList_append(struct ArgList* ab, const struct NArgToken* at) {
+    if(ab == NULL || at == NULL) {return INVALID_INPUT;}
 
     struct _ArgListNode* n_node = _ArgListNode_new(at);
     if(n_node == NULL) {return ALLOCATION_FAIL;}
@@ -112,38 +108,13 @@ int ArgList_append(struct ArgList* ab, const struct ArgToken* at) {
     return SUCESS;
 }
 
-int ArgList_appendPosArg(struct ArgList* ab, const struct PosArg* pa) {
-    struct ArgToken at = {
-        .arg.pa = *pa,
-        .type = POSITIONAL
-    };
-    return ArgList_append(ab, &at);
+int ArgList_appendManual(struct ArgList* ab, enum KeyType kt, const char* key, enum DataType at, const char* arg) {
+    struct NArgToken* nat = NArgToken_newConstruct(kt, key, at, arg);
+    int temp = ArgList_append(ab, nat);
+    NArgToken_end(nat);
+    return temp;
 }
 
-int ArgList_appendManualPosArg(struct ArgList* ab, const char* arg, size_t pos) {
-    struct PosArg pa = {
-        .pos = pos,
-        .value = arg
-    };
-    return ArgList_appendPosArg(ab, &pa);
-}
-
-
-int ArgList_appendKeyArg(struct ArgList* ab, const struct KeyArg* ka) {
-    struct ArgToken at = {
-        .arg.ka = *ka,
-        .type = KEY
-    };
-    return ArgList_append(ab, &at);
-}
-
-int ArgList_appendManualKeyArg(struct ArgList* ab, const char* arg, const char* key) {
-    struct KeyArg ka = {
-        .key = key,
-        .value = arg
-    };
-    return ArgList_appendKeyArg(ab, &ka);
-}
 
 
 int ArgList_remove(struct ArgList* ab, size_t index) {
@@ -152,8 +123,11 @@ int ArgList_remove(struct ArgList* ab, size_t index) {
 
     struct _ArgListNode* prvw_node = _ArgList_getNode(ab->head, index  -1);
     if(prvw_node == NULL) {return FAIL;}
+
     struct _ArgListNode* next_node = _ArgListNode_end(prvw_node->next_node);
     prvw_node = next_node;
+
+    ab->size -= 1;
     return SUCESS;
 }
 
@@ -165,6 +139,8 @@ void ArgListIterator_init(struct ArgListIterator* ali, const struct ArgList* al)
 
 int ArgListIterator_jump(struct ArgListIterator* ali) {
     if(ali == NULL) {return INVALID_INPUT;}
+    else if(ali->iterator == NULL) {return FAIL;}
+
     if(ali->iterator->next_node == NULL) {
         ali->iterator = ali->_head;
         return TURN_AROUND;
