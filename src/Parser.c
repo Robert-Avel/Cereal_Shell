@@ -58,23 +58,21 @@ int Parser_makeArgs(struct Parser* p) {
 
     const char** str_arr = p->stra->array;
 
-    char temp_char[16] = {0};
     for (int i = 0; i < p->stra->size; i++) {
         if(str_arr[i][0] == ARG_PREFIX) {
             if(str_arr[i + 1] == NULL) {return FAIL;}
-            ArgList_appendManual(p->argl, NAMED, str_arr[i], STRING, str_arr[i+1]);
+            ArgList_appendManual(p->argl, NAMED, &str_arr[i], STRING, &str_arr[i+1]);
             i++;
         }
         else {
-            sprintf(temp_char, "%d", i);
-            ArgList_appendManual(p->argl, POSITIONAL, temp_char, STRING, str_arr[i]);
+            ArgList_appendManual(p->argl, POSITIONAL, &i, STRING, &str_arr[i]);
         }
 
         continue;
     }
 
-    StrArray_end(p->stra);
-    p->stra = NULL;
+    //StrArray_end(p->stra);
+    //p->stra = NULL;
     return 0;
 }
 
@@ -95,6 +93,20 @@ int Parser_analyzeArg(struct Parser* p) {
         }
     } while(ArgListIterator_jump(&ali) != 5);
     return SUCCESS;
+}
+
+
+int Parser_start(struct Parser* p, const char* cmd) {
+    ArgList_end(p->argl);
+    StrArray_end(p->stra);
+
+    p->argl = ArgList_new();
+    p->stra = StrArray_new();
+
+    Parser_setCmd(p, cmd);
+    Parser_slip(p);
+    Parser_makeArgs(p);
+    return Parser_analyzeArg(p);
 }
 
 

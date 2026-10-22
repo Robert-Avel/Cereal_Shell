@@ -32,7 +32,7 @@ int NArgToken_setKey(struct NArgToken* nat, enum KeyType kt, const void* key) {
 
     switch (kt) {
         case NAMED:
-            nat->key.named = strdup((const char*) key);
+            nat->key.named = strdup(*(const char**) key);
             break;
         case POSITIONAL:
             nat->key.pos = *(position*) key;
@@ -117,7 +117,7 @@ int NArgToken_setArg(struct NArgToken* nat, enum DataType at, const void* arg) {
             nat->arg.ull = *(unsigned long long*) arg;
             break;
         case STRING:
-            nat->arg.cc = strdup((const char*) arg);
+            nat->arg.cc = strdup(*(const char**) arg);
             break;
         case VOID:
         default:
@@ -177,11 +177,11 @@ int NArgToken_setAllConvert(struct NArgToken* nat, enum KeyType kt, const char* 
 }
 
 
-struct NArgToken* NArgToken_newConstruct(enum KeyType kt, const char* key, enum DataType at, const char* arg) {
+struct NArgToken* NArgToken_newConstruct(enum KeyType kt, const void* key, enum DataType at, const void* arg) {
     struct NArgToken* nat = NArgToken_new();
 
-    NArgToken_setConvertKey(nat, kt, key);
-    NArgToken_setConvertArg(nat, at, arg);
+    NArgToken_setKey(nat, kt, key);
+    NArgToken_setArg(nat, at, arg);
 
     return nat;
 }
@@ -196,13 +196,13 @@ int NArgToken_end(struct NArgToken* nat) {
 }
 
 
-_SET_ARG_BODY(short,              SHORT,              s)
-_SET_ARG_BODY(int,                INT,                i)
-_SET_ARG_BODY(long,               LONG,               l)
-_SET_ARG_BODY(long long,          LONG_LONG,          ll)
-_SET_ARG_BODY(unsigned short,     UNSIGNED_SHORT,     us)
-_SET_ARG_BODY(unsigned int,       UNSIGNED_INT,       ui)
-_SET_ARG_BODY(unsigned long,      UNSIGNED_LONG,      ul)
-_SET_ARG_BODY(unsigned long long, UNSIGNED_LONG_LONG, ull)
-_SET_ARG_BODY(const char*,        STRING,             cc)
-_SET_ARG_BODY(bool,               BOOL,               b)
+_SET_ARG_BODY(const short,              SHORT,              s)
+_SET_ARG_BODY(const int,                INT,                i)
+_SET_ARG_BODY(const long,               LONG,               l)
+_SET_ARG_BODY(const long long,          LONG_LONG,          ll)
+_SET_ARG_BODY(const unsigned short,     UNSIGNED_SHORT,     us)
+_SET_ARG_BODY(const unsigned int,       UNSIGNED_INT,       ui)
+_SET_ARG_BODY(const unsigned long,      UNSIGNED_LONG,      ul)
+_SET_ARG_BODY(const unsigned long long, UNSIGNED_LONG_LONG, ull)
+_SET_ARG_BODY(const char*,              STRING,             cc)
+_SET_ARG_BODY(const bool,               BOOL,               b)

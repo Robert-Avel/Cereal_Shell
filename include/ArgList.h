@@ -5,7 +5,7 @@
 #include "ArgToken2.h"
 #include <stddef.h>
 
-#define EXPANTION_TAX 10
+#define ITERATOR_TURN_AROUND 5
 
 
 struct _ArgListNode {
@@ -24,9 +24,12 @@ struct ArgList* ArgList_new();
 int ArgList_end(struct ArgList* ab);
 
 const struct NArgToken* ArgList_getArg(struct ArgList* al, size_t index);
+const struct NArgToken* ArgList_getArgPositional(struct ArgList* al, position pos);
+const struct NArgToken* ArgList_getArgNamed(struct ArgList* al, const char* key);
+
 
 int ArgList_append(struct ArgList* ab, const struct NArgToken* at);
-int ArgList_appendManual(struct ArgList* ab, enum KeyType kt, const char* key, enum DataType at, const char* arg);
+int ArgList_appendManual(struct ArgList* ab, enum KeyType kt, const void* key, enum DataType at, const void* arg);
 
 int ArgList_remove(struct ArgList* ab, size_t index);
 

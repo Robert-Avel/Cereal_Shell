@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 #define _SET_ARG_SIGN(type, func_ext)                                \
-    type* NArgToken_getArg_##func_ext (struct NArgToken* nat)
+    type* NArgToken_getArg_##func_ext (const struct NArgToken* nat)
 
 
 #define _SET_ARG_BODY(type, enum_type, union_var)                    \
@@ -80,19 +80,19 @@ int NArgToken_setConvertArg(struct NArgToken* nat, enum DataType at, const char*
 
 int NArgToken_setAllConvert(struct NArgToken* nat, enum KeyType kt, const char* key, enum DataType at, const char* arg);
 
-struct NArgToken* NArgToken_newConstruct(enum KeyType kt, const char* key, enum DataType at, const char* arg);
+struct NArgToken* NArgToken_newConstruct(enum KeyType kt, const void* key, enum DataType at, const void* arg);
 int NArgToken_end(struct NArgToken* nat);
 
 
-_SET_ARG_SIGN(short,              s);
-_SET_ARG_SIGN(int,                i);
-_SET_ARG_SIGN(long,               l);
-_SET_ARG_SIGN(long long,          ll);
-_SET_ARG_SIGN(unsigned short,     us);
-_SET_ARG_SIGN(unsigned int,       ui);
-_SET_ARG_SIGN(unsigned long,      ul);
-_SET_ARG_SIGN(unsigned long long, ull);
-_SET_ARG_SIGN(const char*,        cc);
-_SET_ARG_SIGN(bool,               b);
+_SET_ARG_SIGN(const short,              s);
+_SET_ARG_SIGN(const int,                i);
+_SET_ARG_SIGN(const long,               l);
+_SET_ARG_SIGN(const long long,          ll);
+_SET_ARG_SIGN(const unsigned short,     us);
+_SET_ARG_SIGN(const unsigned int,       ui);
+_SET_ARG_SIGN(const unsigned long,      ul);
+_SET_ARG_SIGN(const unsigned long long, ull);
+_SET_ARG_SIGN(const char*,              cc);
+_SET_ARG_SIGN(const bool,               b);
 
 #endif

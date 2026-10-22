@@ -23,6 +23,7 @@ int Parser_setCmd(struct Parser* p, const char* cmd);
 int Parser_slip(struct Parser* p);
 int Parser_makeArgs(struct Parser* p);
 int Parser_analyzeArg(struct Parser* p);
+int Parser_start(struct Parser* p, const char* cmd);
 
 int Parser_end(struct Parser* p);
 
