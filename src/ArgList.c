@@ -157,7 +157,7 @@ int ArgListIterator_jump(struct ArgListIterator* ali) {
 }
 
 
-const struct NArgToken* ArgList_getArgPositional(struct ArgList* al, position pos) {
+struct NArgToken* ArgList_getArgPositional(struct ArgList* al, position pos) {
     if(al == NULL ) {return NULL;}
 
     struct ArgListIterator it;
@@ -170,7 +170,7 @@ const struct NArgToken* ArgList_getArgPositional(struct ArgList* al, position po
     return NULL;
 }
 
-const struct NArgToken* ArgList_getArgNamed(struct ArgList* al, const char* key) {
+struct NArgToken* ArgList_getArgNamed(struct ArgList* al, const char* key) {
     if(al == NULL ) {return NULL;}
 
     struct ArgListIterator it;

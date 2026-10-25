@@ -29,6 +29,17 @@ int Parser_setCmd(struct Parser* p, const char* cmd) {
     return SUCCESS;
 }
 
+
+bool checkString(const char* cc, size_t size) {
+    bool is_valid = false;
+    for(size_t i = 0; i < size; i++) {
+        if(cc[i] == ' ' || cc[i] == '\n' || cc[i] == '\0')
+        {} else is_valid = true;
+    }
+    return is_valid;
+}
+
+
 int Parser_slip(struct Parser* p) {
     size_t csize = strlen(p->commad) + 1;
 
@@ -38,16 +49,17 @@ int Parser_slip(struct Parser* p) {
 
     #define CHAR_PTR p->commad[i]
     for(size_t i = 0; i < csize; i++) {
+        if(CHAR_PTR == '\n') {continue;}
         if(CHAR_PTR == '"') {on_quotes = !on_quotes;}
         if(CHAR_PTR != ' ' && !marking && CHAR_PTR != '"') {
             marker = i;
             marking = true;
-            continue;
         }
         else if(marking && !on_quotes && (CHAR_PTR == ' ' || CHAR_PTR == '"' || CHAR_PTR == '\0')) {
-            StrArray_append(p->stra, p->commad + marker, i - marker - 1);
-            marking = false;
-            continue;
+            if(checkString(p->commad + marker, i - marker - 1)) {
+                StrArray_append(p->stra, p->commad + marker, i - marker - 1);
+                marking = false;
+            }
         }
     }
     return 0;

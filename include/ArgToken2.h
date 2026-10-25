@@ -92,7 +92,7 @@ _SET_ARG_SIGN(const unsigned short,     us);
 _SET_ARG_SIGN(const unsigned int,       ui);
 _SET_ARG_SIGN(const unsigned long,      ul);
 _SET_ARG_SIGN(const unsigned long long, ull);
-_SET_ARG_SIGN(const char*,              cc);
+_SET_ARG_SIGN(const char* const,        cc);
 _SET_ARG_SIGN(const bool,               b);
 
 #endif

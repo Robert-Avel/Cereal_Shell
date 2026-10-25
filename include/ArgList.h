@@ -24,8 +24,8 @@ struct ArgList* ArgList_new();
 int ArgList_end(struct ArgList* ab);
 
 const struct NArgToken* ArgList_getArg(struct ArgList* al, size_t index);
-const struct NArgToken* ArgList_getArgPositional(struct ArgList* al, position pos);
-const struct NArgToken* ArgList_getArgNamed(struct ArgList* al, const char* key);
+struct NArgToken* ArgList_getArgPositional(struct ArgList* al, position pos);
+struct NArgToken* ArgList_getArgNamed(struct ArgList* al, const char* key);
 
 
 int ArgList_append(struct ArgList* ab, const struct NArgToken* at);
