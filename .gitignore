@@ -2,3 +2,4 @@
 *.clangd
 test
 test.c
+test2.c

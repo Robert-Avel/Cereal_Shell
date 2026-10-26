@@ -66,7 +66,7 @@ enum LexerToken peekNext(const struct Lexemas* lxm) {
 int _Parser_PosArgAnalyze(struct Function* fn, struct Lexemas* lxm, size_t* cursor, position* i_p) {
     switch (peek(lxm)) {
         case T_TEXT:
-            ArgList_appendManual(fn->args, POSITIONAL, i_p, STRING, lxm->var);
+            ArgList_appendManual(fn->args, POSITIONAL, i_p, STRING, &lxm->var);
             break;
         case T_NUM:
             unsigned long var = strtol(lxm->var, NULL, 10);
@@ -89,22 +89,22 @@ int _Parser_PosArgAnalyze(struct Function* fn, struct Lexemas* lxm, size_t* curs
 int _Parser_KeyArgAnalyze(struct Function* fn, struct Lexemas* lxm, size_t* cursor, const char* key) {
     switch (peek(lxm)) {
         case T_TEXT:
-            ArgList_appendManual(fn->args, NAMED, key, STRING, lxm->var);
+            ArgList_appendManual(fn->args, NAMED, &key, STRING, &lxm->var);
             break;
         case T_NUM:
             unsigned long var = strtoul(lxm->var, NULL, 10);
-            ArgList_appendManual(fn->args, NAMED, key, UNSIGNED_LONG, &var);
+            ArgList_appendManual(fn->args, NAMED, &key, UNSIGNED_LONG, &var);
             break;
         case T_TRUE:
         case T_FALSE:
             bool v = peek(lxm) == T_TRUE;
-            ArgList_appendManual(fn->args, NAMED, key, BOOL, &v);
+            ArgList_appendManual(fn->args, NAMED, &key, BOOL, &v);
             break;
         case T_DASH:
             if(peekNext(lxm) == T_NUM) {
                 long var = strtol(lxm->var, NULL, 10);
                 var *= -1;
-                ArgList_appendManual(fn->args, NAMED, key, LONG, &var);
+                ArgList_appendManual(fn->args, NAMED, &key, LONG, &var);
                 *cursor += 1;
                 break;
             }
@@ -163,9 +163,11 @@ int _Parser_FunctionLoop(struct Parser* p, struct Lexer* lx, size_t* cursor) {
             case T_EOF:
                 r = EXPECTED_SEMI_COLON;
         }
-        if(r != 0) {break;}
+        if(r != 0) {
+            Function_end(&fn, false);
+            break;
+        }
     }
-    Function_end(&fn, false);
     return r;
 }
 

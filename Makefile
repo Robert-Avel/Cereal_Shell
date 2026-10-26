@@ -1,6 +1,6 @@
 CXX := gcc
 TEST_EXE := test
-TEST_FILE := test2.c
+TEST_FILE := test.c
 INCLUDE := -Iinclude
 SRC := $(shell find src -name "*.c")
 

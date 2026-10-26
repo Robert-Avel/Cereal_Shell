@@ -26,7 +26,7 @@ int NArgToken_resetKey(struct NArgToken* nat) {
     return 0;
 }
 
-int NArgToken_setKey(struct NArgToken* nat, enum KeyType kt, const void** key) {
+int NArgToken_setKey(struct NArgToken* nat, enum KeyType kt, const void* key) {
     if (nat == NULL) {return 2;}
     NArgToken_resetKey(nat);
 
@@ -87,7 +87,7 @@ int NArgToken_resetArg(struct NArgToken* nat) {
 }
 
 
-int NArgToken_setArg(struct NArgToken* nat, enum DataType at, const void** arg) {
+int NArgToken_setArg(struct NArgToken* nat, enum DataType at, const void* arg) {
     if (nat == NULL) {return 2;}
     NArgToken_resetArg(nat);
 
@@ -118,6 +118,9 @@ int NArgToken_setArg(struct NArgToken* nat, enum DataType at, const void** arg) 
             break;
         case STRING:
             nat->arg.cc = strdup(*(const char**) arg);
+            break;
+        case BOOL:
+            nat->arg.b = *(bool*) arg;
             break;
         case VOID:
         default:
@@ -160,6 +163,9 @@ int NArgToken_setConvertArg(struct NArgToken* nat, enum DataType at, const char*
         case STRING:
             nat->arg.cc = tmp;
             break;
+        case BOOL:
+            nat->arg.b = (bool) arg;
+            break;
         case VOID:
         default:
             return 1;
@@ -180,8 +186,8 @@ int NArgToken_setAllConvert(struct NArgToken* nat, enum KeyType kt, const char* 
 struct NArgToken* NArgToken_newConstruct(enum KeyType kt, const void* key, enum DataType at, const void* arg) {
     struct NArgToken* nat = NArgToken_new();
 
-    NArgToken_setKey(nat, kt, &key);
-    NArgToken_setArg(nat, at, &arg);
+    NArgToken_setKey(nat, kt, key);
+    NArgToken_setArg(nat, at, arg);
 
     return nat;
 }
