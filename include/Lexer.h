@@ -1,3 +1,6 @@
+#ifndef LEXER_H
+#define LEXER_H
+
 #include <stddef.h>
 #include <stdbool.h>
 enum LexerToken {
@@ -44,3 +47,5 @@ int Lexer_setInput(struct Lexer* l, const char* input);
 int Lexer_start(struct Lexer* l);
 
 int Lexer_end(struct Lexer* l);
+
+#endif

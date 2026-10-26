@@ -15,9 +15,8 @@ int Lexemas_init(struct Lexemas* lex, enum LexerToken type, const char* var, siz
             lex->var = strdup(var);
             if(lex->var == NULL) {return 2;}
         } else {
-            lex->var = malloc(sizeof(char) * size + 1);
+            lex->var = strndup(var, size);
             if(lex->var == NULL) {return 2;}
-            strncpy((char*) lex->var, var, size);
         }
     }
     lex->lt = type;
@@ -195,7 +194,7 @@ int Lexer_start(struct Lexer* l) {
     if(l->cursor != 0) {return 2;}
 
 
-    while(*Lexer_char(l) != '\0') {
+    do {
         if(*Lexer_char(l) == ' ') {
             l->cursor++;
             continue;
@@ -218,6 +217,6 @@ int Lexer_start(struct Lexer* l) {
             continue;
         }
         l->cursor++;
-    }
+    } while(*Lexer_char(l) != '\0');
     return 0;
 }

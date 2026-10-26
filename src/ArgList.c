@@ -20,9 +20,7 @@ struct _ArgListNode* _ArgListNode_new(const struct NArgToken* nat) {
     if(alb == NULL) {return NULL;}
 
     alb->next_node = NULL;
-    alb->at = NArgToken_new();
-    NArgToken_setKey(alb->at, nat->key_type, &nat->key);
-    NArgToken_setArg(alb->at, nat->arg_type, &nat->arg);
+    alb->at = NArgToken_newConstruct(nat->key_type, &nat->key, nat->arg_type, &nat->arg);
     return alb;
 }
 

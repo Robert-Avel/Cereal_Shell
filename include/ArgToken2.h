@@ -67,14 +67,14 @@ struct NArgToken {
 struct NArgToken* NArgToken_new();
 
 int NArgToken_resetKey(struct NArgToken* nat);
-int NArgToken_setKey(struct NArgToken* nat, enum KeyType kt, const void* key);
+int NArgToken_setKey(struct NArgToken* nat, enum KeyType kt, const void** key);
 int NArgToken_setConvertKey(struct NArgToken* nat, enum KeyType kt, const char* key);
 
 const char** NArgToken_getKeyNamed(struct NArgToken* nat);
 position* NArgToken_getKeyPositional(struct NArgToken* nat);
 
 int NArgToken_resetArg(struct NArgToken* nat);
-int NArgToken_setArg(struct NArgToken* nat, enum DataType at, const void* arg);
+int NArgToken_setArg(struct NArgToken* nat, enum DataType at, const void** arg);
 int NArgToken_setConvertArg(struct NArgToken* nat, enum DataType at, const char* arg);
 
 
