@@ -14,4 +14,5 @@ struct Function* Function_new(const char* name);
 int Function_init(struct Function* f, const char* name);
 int Function_end(struct Function* f, bool allocated_ptr);
 
+
 #endif
