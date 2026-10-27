@@ -12,6 +12,7 @@
 #include "Lexer.h"
 
 enum Status {
+    CONTINUE = -1,
     SUCCESS,
     FAIL,
     EXPECTED_NAME_FUNCTION,
@@ -68,7 +69,7 @@ int _Parser_PosArgAnalyze(struct Function* fn, struct Lexemas* lxm, size_t* curs
         case T_TEXT:
             ArgList_appendManual(fn->args, POSITIONAL, i_p, STRING, &lxm->var);
             break;
-        case T_NUM:
+        case T_NUM:;
             unsigned long var = strtol(lxm->var, NULL, 10);
             ArgList_appendManual(fn->args, POSITIONAL, i_p, UNSIGNED_LONG, &var);
             break;
@@ -80,9 +81,9 @@ int _Parser_PosArgAnalyze(struct Function* fn, struct Lexemas* lxm, size_t* curs
         default:
             return FAIL;
     }
-    *cursor += 1;
+    if(cursor != NULL) {*cursor += 1;}
     *i_p += 1;
-    return SUCCESS;
+    return CONTINUE;
 }
 
 
@@ -91,7 +92,7 @@ int _Parser_KeyArgAnalyze(struct Function* fn, struct Lexemas* lxm, size_t* curs
         case T_TEXT:
             ArgList_appendManual(fn->args, NAMED, &key, STRING, &lxm->var);
             break;
-        case T_NUM:
+        case T_NUM:;
             unsigned long var = strtoul(lxm->var, NULL, 10);
             ArgList_appendManual(fn->args, NAMED, &key, UNSIGNED_LONG, &var);
             break;
@@ -105,7 +106,7 @@ int _Parser_KeyArgAnalyze(struct Function* fn, struct Lexemas* lxm, size_t* curs
                 long var = strtol(lxm->var, NULL, 10);
                 var *= -1;
                 ArgList_appendManual(fn->args, NAMED, &key, LONG, &var);
-                *cursor += 1;
+                if(cursor != NULL) {*cursor += 1;}
                 break;
             }
         case T_NULL:
@@ -114,8 +115,8 @@ int _Parser_KeyArgAnalyze(struct Function* fn, struct Lexemas* lxm, size_t* curs
         case T_EOF:
             return EXPECTED_EXPRESSION;
     }
-    *cursor += 3;
-    return SUCCESS;
+    if(cursor != NULL) {*cursor += 3;}
+    return CONTINUE;
 }
 
 
@@ -124,16 +125,16 @@ void _Parser_NegativeNum(struct Function* fn, struct Lexemas* lxm, size_t* curso
     long var = strtol(lxm->var, NULL, 10);
     var *= -1;
     ArgList_appendManual(fn->args, POSITIONAL, i_p, LONG, &var);
-    *cursor += 2;
+    if(cursor != NULL) {*cursor += 2;}
     *i_p += 1;
 }
 
 int _Parser_FunctionLoop(struct Parser* p, struct Lexer* lx, size_t* cursor) {
     struct Function fn;
-    Function_init(&fn, lx->lxmas[*cursor].var);
+    Function_init(&fn, (lx->lxmas + *cursor)->var);
     *cursor += 1;
 
-    int r;
+    int r = -1;
     position i_p = 0;
     bool only_kargs = false;
 
@@ -149,24 +150,30 @@ int _Parser_FunctionLoop(struct Parser* p, struct Lexer* lx, size_t* cursor) {
                 break;
             case T_DASH:
                 if (peekNext(pointed_lxm) == T_NUM) {
-                    if(only_kargs) {return KW_ARGS_ONLY_ERROR;}
-                    _Parser_NegativeNum(&fn, pointed_lxm, cursor, &i_p);
-                    break;
-                } else if (peekNext(pointed_lxm) == T_TEXT) {
+                    if(only_kargs) {return r = KW_ARGS_ONLY_ERROR; break;}
+
+                    _Parser_NegativeNum(&fn, pointed_lxm + 1, cursor, &i_p);
+                }
+                else if (peekNext(pointed_lxm) == T_TEXT) {
                     r = _Parser_KeyArgAnalyze(&fn, pointed_lxm + 2, cursor, (pointed_lxm + 1)->var);
-                } else r = EXPECTED_EXPRESSION;
+                }
+                else {r = EXPECTED_EXPRESSION;}
+                break;
             case T_NULL:
                 r = LEXER_ERROR;
+                break;
             case T_SEMI_COLON:
                 Parser_append(p, &fn);
                 r = SUCCESS;
+                break;
             case T_EOF:
                 r = EXPECTED_SEMI_COLON;
+                break;
         }
-        if(r != 0) {
+        if(r > 0) {
             Function_end(&fn, false);
             break;
-        }
+        } else if(r == 0) {break;}
     }
     return r;
 }
