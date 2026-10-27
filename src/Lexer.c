@@ -207,6 +207,7 @@ int Lexer_start(struct Lexer* l) {
         }
         else if (*Lexer_char(l) == '\0') {
             Lexer_newLexemas(l, T_EOF, NULL, 0);
+            break;
         }
         else if(*Lexer_char(l) == '"' || isalpha(*Lexer_char(l))) {
             Lexer_TextLoop(l, *Lexer_char(l) == '"');
@@ -217,6 +218,6 @@ int Lexer_start(struct Lexer* l) {
             continue;
         }
         l->cursor++;
-    } while(*Lexer_char(l) != '\0');
+    } while(1);
     return 0;
 }

@@ -156,6 +156,7 @@ int _Parser_FunctionLoop(struct Parser* p, struct Lexer* lx, size_t* cursor) {
                 }
                 else if (peekNext(pointed_lxm) == T_TEXT) {
                     r = _Parser_KeyArgAnalyze(&fn, pointed_lxm + 2, cursor, (pointed_lxm + 1)->var);
+                    only_kargs = true;
                 }
                 else {r = EXPECTED_EXPRESSION;}
                 break;
@@ -173,14 +174,30 @@ int _Parser_FunctionLoop(struct Parser* p, struct Lexer* lx, size_t* cursor) {
         if(r > 0) {
             Function_end(&fn, false);
             break;
-        } else if(r == 0) {break;}
+        } else if(r == 0) {
+            *cursor += 1;
+            break;
+        }
     }
     return r;
 }
 
+int Parser_reset(struct Parser* p) {
+    if(p == NULL) {return FAIL;}
+    for(size_t i = 0; i < p->size; i++) {
+        Function_end((p + i)->functions, false);
+    }
+    free(p->functions);
+
+    p->functions = NULL;
+    p->allocated = 0;
+    p->size = 0;
+    return 0;
+}
 
 int Parser_Start(struct Parser* p, struct Lexer* lx) {
     if(lx == NULL) {return FAIL;}
+    Parser_reset(p);
 
     size_t cursor = 0;
     while (1) {
@@ -188,7 +205,8 @@ int Parser_Start(struct Parser* p, struct Lexer* lx) {
 
         if(lxm->lt == T_TEXT) {
             if(lxm->var == NULL) {return EXPECTED_NAME_FUNCTION;}
-            _Parser_FunctionLoop(p, lx, &cursor);
+            int r = _Parser_FunctionLoop(p, lx, &cursor);
+            if(r != 0) {return r;}
         }
 
         else if(lxm->lt == T_EOF) {
@@ -200,11 +218,13 @@ int Parser_Start(struct Parser* p, struct Lexer* lx) {
 }
 
 
-
 int Parser_end(struct Parser* p) {
     if(p == NULL) {return FAIL;}
 
-    free(p->functions);;
+    for(size_t i = 0; i < p->size; i++) {
+        Function_end((p + i)->functions, false);
+    }
+    free(p->functions);
     free(p);
     return SUCCESS;
 }
