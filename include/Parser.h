@@ -7,6 +7,18 @@
 #include "ArgToken2.h"
 
 
+enum __Status {
+    CONTINUE = -1,
+    SUCCESS,
+    FAIL,
+    EXPECTED_NAME_FUNCTION,
+    LEXER_ERROR,
+    EXPECTED_SEMI_COLON,
+    KW_ARGS_ONLY_ERROR,
+    EXPECTED_EXPRESSION,
+};
+
+
 struct Parser {
     size_t allocated;
     size_t size;

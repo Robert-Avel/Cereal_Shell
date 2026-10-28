@@ -5,7 +5,39 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+#include <ASCIIEscapeColors.h>
+#include <strings.h>
+
+static void printError(int err) {
+    switch (err) {
+        case FAIL:
+            printf(FG_RED "[Cereal Shell] Fatal Error" RESET "\n");
+            break;
+        case EXPECTED_NAME_FUNCTION:
+            printf(FG_RED "[Cereal Shell] Syntax Error: Expected Name Function" RESET "\n");
+            break;
+        case LEXER_ERROR:
+            printf(FG_RED "[Cereal Shell] Lexer Error: Invalid Expression" RESET "\n");
+            break;
+        case EXPECTED_SEMI_COLON:
+            printf(FG_RED "[Cereal Shell] Syntax Error: Expected Semi Colon" RESET "\n");
+            break;
+        case KW_ARGS_ONLY_ERROR:
+            printf(FG_RED "[Cereal Shell] Syntax Error: Positional Args after Named Args are not allowed" RESET "\n");
+            break;
+        case EXPECTED_EXPRESSION:
+            printf(FG_RED "[Cereal Shell] Syntax Error: Expected Expression" RESET "\n");
+            break;
+        case 10:
+            printf(FG_RED "[Cereal Shell] Function Not Found in System" RESET "\n");
+            break;
+        case CONTINUE:
+        case SUCCESS:
+            break;
+    }
+}
 
 
 int Map_init(struct Map* mp, const char* key, WrapperFunction f) {
@@ -140,4 +172,21 @@ int CerealShell_start(struct CerealShell* cs, const char* input) {
     int status = __CerealShell_start(cs, input);
     CerealShell_reset(cs);
     return status;
+}
+
+
+void CerealShell_initLoop(struct CerealShell* cs) {
+    size_t ss = 0;
+    char* inp = NULL;
+    while (1) {
+        printf(FG_BLUE "[Cereal Shell] " RESET);
+        getline(&inp, &ss, stdin);
+
+        int end = CerealShell_start(cs, inp);
+        if(end > 0) {printError(end);}
+
+        if(strcmp(inp, "quit") == 0) {return;}
+        free(inp);
+        inp = NULL;
+    }
 }

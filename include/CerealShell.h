@@ -33,3 +33,4 @@ int CerealShell_end(struct CerealShell* cs);
 int CerealShell_newFunction(struct CerealShell* cs, const char* key, WrapperFunction f);
 const struct Map* CerealShell_getFunction(struct CerealShell* cs, const char* key);
 int CerealShell_start(struct CerealShell* cs, const char* input);
+void CerealShell_initLoop(struct CerealShell* cs);

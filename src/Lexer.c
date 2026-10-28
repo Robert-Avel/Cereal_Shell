@@ -121,7 +121,7 @@ int Lexer_stepCursor(struct Lexer* l) {
 
 int Lexer_setInput(struct Lexer* l, const char* input) {
     if (l == NULL) {return 1;}
-    if(l->input != NULL) {free((char*) l->input);}
+    Lexer_clear(l);
 
     l->input = strdup(input);
     if(l->input == NULL) {return 2;}

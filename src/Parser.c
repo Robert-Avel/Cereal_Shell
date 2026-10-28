@@ -11,17 +11,6 @@
 #include "Function.h"
 #include "Lexer.h"
 
-enum Status {
-    CONTINUE = -1,
-    SUCCESS,
-    FAIL,
-    EXPECTED_NAME_FUNCTION,
-    LEXER_ERROR,
-    EXPECTED_SEMI_COLON,
-    KW_ARGS_ONLY_ERROR,
-    EXPECTED_EXPRESSION,
-};
-
 struct Parser* Parser_new() {
     struct Parser* psr = malloc(sizeof(struct Parser));
     psr->functions = NULL;
