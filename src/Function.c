@@ -28,3 +28,11 @@ int Function_end(struct Function* f, bool allocated_ptr) {
     if(allocated_ptr) {free(f);}
     return 0;
 }
+
+
+const struct NArgToken* Function_getArgPositional(const struct Function* f, position p) {
+    return ArgList_getArgPositional(f->args, p);
+}
+const struct NArgToken* Function_getArgNamed(const struct Function* f, const char* k) {
+    return ArgList_getArgNamed(f->args, k);
+}

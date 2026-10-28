@@ -160,6 +160,7 @@ struct NArgToken* ArgList_getArgPositional(struct ArgList* al, position pos) {
 
     struct ArgListIterator it;
     ArgListIterator_init(&it, al);
+    if(it.iterator == NULL) {return NULL;}
     do {
         if(it.iterator->at->key_type != POSITIONAL) {continue;}
         if(it.iterator->at->key.pos != pos) {continue;}
@@ -173,6 +174,8 @@ struct NArgToken* ArgList_getArgNamed(struct ArgList* al, const char* key) {
 
     struct ArgListIterator it;
     ArgListIterator_init(&it, al);
+    if(it.iterator == NULL) {return NULL;}
+
     do {
         if(it.iterator->at->key_type != NAMED) {continue;}
         if(strcmp(it.iterator->at->key.named, key) != 0) {continue;}
