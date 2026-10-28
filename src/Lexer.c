@@ -152,7 +152,7 @@ void Lexer_TextLoop(struct Lexer* l, bool in_quotes) {
             }
         }
         else {
-            if(*Lexer_char(l) == '\0' || *Lexer_char(l) == ' ' || *Lexer_char(l) == ';'|| *Lexer_char(l) == '-') {
+            if(*Lexer_char(l) == '\0' || *Lexer_char(l) == ' ' || *Lexer_char(l) == ';'|| *Lexer_char(l) == '-' || *Lexer_char(l) == '\n') {
                 if(l->cursor - mark == 4 && strncmp(l->input + mark, "true", 4) == 0) {
                     Lexer_newLexemas(l, T_TRUE, NULL, 0);
                 }
@@ -177,11 +177,16 @@ void Lexer_IntegerLoop(struct Lexer* l) {
     size_t mark = l->cursor;
 
     while(1) {
-        if(*Lexer_char(l) == ' ' || *Lexer_char(l) == '\0' || *Lexer_char(l) == ';') {
+        if(*Lexer_char(l) == ' ' || *Lexer_char(l) == '\0' || *Lexer_char(l) == ';' || *Lexer_char(l) == '\n') {
             Lexer_newLexemas(l, T_NUM, l->input + mark, l->cursor - mark);
             return;
         }
-        if(!isdigit(*Lexer_char(l))) {
+        else if(*Lexer_char(l) == 'U') {
+            Lexer_newLexemas(l, T_UNSIGNED_NUM, l->input + mark, l->cursor - mark);
+            l->cursor++;
+            return;
+        }
+        else if(!isdigit(*Lexer_char(l))) {
             Lexer_newLexemas(l, T_NULL, NULL, 0);
         }
         l->cursor++;
@@ -195,7 +200,7 @@ int Lexer_start(struct Lexer* l) {
 
 
     do {
-        if(*Lexer_char(l) == ' ') {
+        if(*Lexer_char(l) == ' '|| *Lexer_char(l) == '\n') {
             l->cursor++;
             continue;
         }

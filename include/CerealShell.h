@@ -5,6 +5,9 @@
 #include <stddef.h>
 
 
+#define CEREAL_INPUT_HEAD "Cereal_Shell >"
+
+
 typedef void (*WrapperFunction) (const struct Function*);
 
 

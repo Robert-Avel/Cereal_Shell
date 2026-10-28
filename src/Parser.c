@@ -55,12 +55,16 @@ enum LexerToken peekNext(const struct Lexemas* lxm) {
 
 int _Parser_PosArgAnalyze(struct Function* fn, struct Lexemas* lxm, size_t* cursor, position* i_p) {
     switch (peek(lxm)) {
+        case T_UNSIGNED_NUM:;
+            unsigned long varu = strtoul(lxm->var, NULL, 10);
+            ArgList_appendManual(fn->args, POSITIONAL, i_p, UNSIGNED_LONG, &varu);
+            break;
         case T_TEXT:
             ArgList_appendManual(fn->args, POSITIONAL, i_p, STRING, &lxm->var);
             break;
         case T_NUM:;
-            unsigned long var = strtol(lxm->var, NULL, 10);
-            ArgList_appendManual(fn->args, POSITIONAL, i_p, UNSIGNED_LONG, &var);
+            long var = strtol(lxm->var, NULL, 10);
+            ArgList_appendManual(fn->args, POSITIONAL, i_p, LONG, &var);
             break;
         case T_TRUE:
         case T_FALSE:
@@ -78,12 +82,16 @@ int _Parser_PosArgAnalyze(struct Function* fn, struct Lexemas* lxm, size_t* curs
 
 int _Parser_KeyArgAnalyze(struct Function* fn, struct Lexemas* lxm, size_t* cursor, const char* key) {
     switch (peek(lxm)) {
+        case T_UNSIGNED_NUM:;
+            unsigned long varu = strtoul(lxm->var, NULL, 10);
+            ArgList_appendManual(fn->args, NAMED, &key, UNSIGNED_LONG, &varu);
+            break;
         case T_TEXT:
             ArgList_appendManual(fn->args, NAMED, &key, STRING, &lxm->var);
             break;
         case T_NUM:;
-            unsigned long var = strtoul(lxm->var, NULL, 10);
-            ArgList_appendManual(fn->args, NAMED, &key, UNSIGNED_LONG, &var);
+            long var = strtol(lxm->var, NULL, 10);
+            ArgList_appendManual(fn->args, NAMED, &key, LONG, &var);
             break;
         case T_TRUE:
         case T_FALSE:
@@ -132,6 +140,7 @@ int _Parser_FunctionLoop(struct Parser* p, struct Lexer* lx, size_t* cursor) {
         switch (peek(pointed_lxm)) {
             case T_TEXT:
             case T_NUM:
+            case T_UNSIGNED_NUM:
             case T_TRUE:
             case T_FALSE:
                 if(only_kargs) {return KW_ARGS_ONLY_ERROR;}
@@ -146,6 +155,10 @@ int _Parser_FunctionLoop(struct Parser* p, struct Lexer* lx, size_t* cursor) {
                 else if (peekNext(pointed_lxm) == T_TEXT) {
                     r = _Parser_KeyArgAnalyze(&fn, pointed_lxm + 2, cursor, (pointed_lxm + 1)->var);
                     only_kargs = true;
+                }
+                else if (peekNext(pointed_lxm) == T_UNSIGNED_NUM) {
+                    r = DASH_WITH_UNSIGNED;
+                    break;
                 }
                 else {r = EXPECTED_EXPRESSION;}
                 break;
@@ -211,7 +224,7 @@ int Parser_end(struct Parser* p) {
     if(p == NULL) {return FAIL;}
 
     for(size_t i = 0; i < p->size; i++) {
-        Function_end((p + i)->functions, false);
+        Function_end((p->functions + i), false);
     }
     free(p->functions);
     free(p);

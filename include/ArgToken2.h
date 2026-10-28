@@ -86,15 +86,15 @@ struct NArgToken* NArgToken_newConstruct(enum KeyType kt, const void* key, enum 
 int NArgToken_end(struct NArgToken* nat);
 
 
-_SET_ARG_SIGN(const short,              s);
-_SET_ARG_SIGN(const int,                i);
-_SET_ARG_SIGN(const long,               l);
-_SET_ARG_SIGN(const long long,          ll);
-_SET_ARG_SIGN(const unsigned short,     us);
-_SET_ARG_SIGN(const unsigned int,       ui);
-_SET_ARG_SIGN(const unsigned long,      ul);
-_SET_ARG_SIGN(const unsigned long long, ull);
-_SET_ARG_SIGN(const char* const,        cc);
-_SET_ARG_SIGN(const bool,               b);
+_SET_ARG_SIGN(const short,                  s);
+_SET_ARG_SIGN(const int,                    i);
+_SET_ARG_SIGN(const long,                   l);
+_SET_ARG_SIGN(const long long,             ll);
+_SET_ARG_SIGN(const unsigned short,        us);
+_SET_ARG_SIGN(const unsigned int,          ui);
+_SET_ARG_SIGN(const unsigned long,         ul);
+_SET_ARG_SIGN(const unsigned long long,   ull);
+_SET_ARG_SIGN(const char* const,           cc);
+_SET_ARG_SIGN(const bool,                   b);
 
 #endif

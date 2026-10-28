@@ -13,25 +13,34 @@
 static void printError(int err) {
     switch (err) {
         case FAIL:
-            printf(FG_RED "[Cereal Shell] Fatal Error" RESET "\n");
+            printf(FG_RED CEREAL_INPUT_HEAD" Fatal Error" RESET "\n");
             break;
         case EXPECTED_NAME_FUNCTION:
-            printf(FG_RED "[Cereal Shell] Syntax Error: Expected Name Function" RESET "\n");
+            printf(FG_RED CEREAL_INPUT_HEAD" Syntax Error: Expected Name Function" RESET "\n");
             break;
         case LEXER_ERROR:
-            printf(FG_RED "[Cereal Shell] Lexer Error: Invalid Expression" RESET "\n");
+            printf(FG_RED CEREAL_INPUT_HEAD" Lexer Error: Invalid Expression" RESET "\n");
             break;
         case EXPECTED_SEMI_COLON:
-            printf(FG_RED "[Cereal Shell] Syntax Error: Expected Semi Colon" RESET "\n");
+            printf(FG_RED CEREAL_INPUT_HEAD" Syntax Error: Expected Semi Colon" RESET "\n");
             break;
         case KW_ARGS_ONLY_ERROR:
-            printf(FG_RED "[Cereal Shell] Syntax Error: Positional Args after Named Args are not allowed" RESET "\n");
+            printf(FG_RED CEREAL_INPUT_HEAD" Syntax Error: Positional Args after Named Args are not allowed" RESET "\n");
             break;
         case EXPECTED_EXPRESSION:
-            printf(FG_RED "[Cereal Shell] Syntax Error: Expected Expression" RESET "\n");
+            printf(FG_RED CEREAL_INPUT_HEAD" Syntax Error: Expected Expression" RESET "\n");
+            break;
+        case DASH_WITH_UNSIGNED:
+            printf(FG_RED CEREAL_INPUT_HEAD" Syntax Error: Cannot convert in negative number with unsigned" RESET "\n");
             break;
         case 10:
-            printf(FG_RED "[Cereal Shell] Function Not Found in System" RESET "\n");
+            printf(FG_RED CEREAL_INPUT_HEAD" Function Not Found in System" RESET "\n");
+            break;
+        case 11:
+            printf(FG_RED CEREAL_INPUT_HEAD" Function Found, but not exectuted! (NULL function)" RESET "\n");
+            break;
+        case 12:
+            printf(FG_RED CEREAL_INPUT_HEAD" No input! "RESET "\n");
             break;
         case CONTINUE:
         case SUCCESS:
@@ -157,19 +166,22 @@ static int __CerealShell_start(struct CerealShell* cs, const char* input) {
     status = Parser_Start(cs->psr, cs->lxr);
     if(status != 0) {return status;}
 
+    struct Function* fncs = cs->psr->functions;
     for(size_t i = 0; i < cs->psr->size; i++) {
-        struct Function* fncs = cs->psr->functions;
-        const struct Map* fmap = CerealShell_getFunction(cs, fncs->name);
+        const struct Map* fmap = CerealShell_getFunction(cs, fncs[i].name);
         if(fmap != NULL) {
-            fmap->wf(fncs);
-            return 0;
+            if(fmap->wf == NULL) {return 11;}
+            fmap->wf(fncs + i);
         }
+        else {return 10;}
     }
-    return 10;
+    return 0;
 }
 
 int CerealShell_start(struct CerealShell* cs, const char* input) {
-    int status = __CerealShell_start(cs, input);
+    int status;
+    if(strlen(input) == 0) {return 12;}
+    status = __CerealShell_start(cs, input);
     CerealShell_reset(cs);
     return status;
 }
@@ -179,7 +191,7 @@ void CerealShell_initLoop(struct CerealShell* cs) {
     size_t ss = 0;
     char* inp = NULL;
     while (1) {
-        printf(FG_BLUE "[Cereal Shell] " RESET);
+        printf(FG_BLUE CEREAL_INPUT_HEAD RESET);
         getline(&inp, &ss, stdin);
 
         int end = CerealShell_start(cs, inp);

@@ -11,7 +11,8 @@ enum LexerToken {
     T_SEMI_COLON, // ';'    4
     T_EOF, //on '\0'        5
     T_TRUE, // boolean 1    6
-    T_FALSE // boolean 2    7
+    T_FALSE, // boolean 0    7
+    T_UNSIGNED_NUM
 };
 
 

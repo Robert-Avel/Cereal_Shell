@@ -7,7 +7,7 @@
 
 
 #define _BOOL_E bool
-#define _STRING_E char*
+#define _STRING_E char* const
 #define _LONG_E long
 #define _UNSIGNED_LONG_E unsigned long
 
@@ -31,12 +31,12 @@
 #define _TOSTR(n) #n
 
 #define _NULL_CHECK \
-    if(f == NULL) {printf(FG_BRIGHT_RED "FUNCTION ERROR" RESET); return;} //checagem Basica
+    if(f == NULL) {printf(FG_BRIGHT_RED "FUNCTION ERROR\n" RESET); return;} //checagem Basica
 
 
 #define _ARGS_CHECHER( n_args ) \
     if(f->args->size != n_args)    \
-    {printf(FG_BRIGHT_RED "ARGS DIVERGENCES" RESET); return;}
+    {printf(FG_BRIGHT_RED "ARGS DIVERGENCES\n" RESET); return;}
 
 #define _ARG_POSITIONAL(pos) \
     const struct NArgToken* a##pos = Function_getArgPositional(f, pos); \
@@ -49,8 +49,12 @@
     const _TYPE_EXTEND_ENUM(type) c##pos = *b##pos;
 
 
-#define _RETURNER(type, function_name, args) \
-    printf(_TYPE_FORMAT_ENUM(type)"\n", function_name args); \
+#define _RETURNER_VOID(function_name, caller) \
+    function_name caller; printf("OK, No Return!\n");  \
+
+
+#define _RETURNER(type, function_name, caller) \
+    printf(_TYPE_FORMAT_ENUM(type)"\n", function_name caller) \
 
 
 #define ARG_ASSEMBLY(pos, type) \
@@ -58,8 +62,17 @@
     _VAR_POSITIONAL(pos, type) \
 
 
-#define FUNCTION_NEW(function_name, return_type, n_args, cargs, args...) \
+#define FUNCTION_NEW(function_name, return_type, n_args, caller, args...) \
     void __outCShell##function_name(const struct Function* f) { \
+    _ARGS_CHECHER( n_args) \
     args \
-    _RETURNER(return_type, function_name, cargs); \
+    _RETURNER(return_type, function_name, caller); \
+    }
+
+
+#define FUNCTION_NEW_VOID(function_name, n_args, caller, args...) \
+    void __outCShell##function_name(const struct Function* f) { \
+    _ARGS_CHECHER( n_args) \
+    args \
+    _RETURNER_VOID(function_name, caller); \
     }
