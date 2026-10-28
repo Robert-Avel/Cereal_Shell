@@ -1,9 +1,23 @@
-CXX := gcc
-TEST_EXE := test
-TEST_FILE := test.c
+CC := gcc
 INCLUDE := -Iinclude
-SRC := $(shell find src -name "*.c")
+
+SRC_DIR := src
+SRC := $(shell find $(SRC_DIR) -name "*.c")
+
+OBJ_DIR := obj
+OBJ := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC))
+
+LIB_NAME := libCerealShell.a
 
 
-$(TEST_EXE):
-	$(CXX) $(INCLUDE) $(TEST_FILE) $(SRC) -o $(TEST_EXE) -g -Wall
+$(LIB_NAME): $(OBJ)
+	ar rcs $@ $^
+
+
+obj/%.o: src/%.c
+	@mkdir -p $(dir $@)
+	$(CC) -c $(INCLUDE) -Wall -o $@ $^
+
+
+clear:
+	rm  $(OBJ)

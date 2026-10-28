@@ -3,3 +3,6 @@
 test
 test.c
 test2.c
+obj
+*.a
+*.o

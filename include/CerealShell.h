@@ -4,8 +4,13 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-
 #define CEREAL_INPUT_HEAD "Cereal_Shell >"
+
+
+#define CS_BOOL BOOL
+#define CS_STRING STRING
+#define CS_LONG LONG
+#define CS_UNSIGNED_LONG UNSIGNED_LONG
 
 
 typedef void (*WrapperFunction) (const struct Function*);
