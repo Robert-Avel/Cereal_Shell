@@ -8,8 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
-
-
+#include "Wrapper.h"
 
 
 static void printError(int err) {
