@@ -22,10 +22,6 @@ struct Map {
 };
 
 
-int Map_init(struct Map* mp, const char* key, WrapperFunction f);
-int Map_end(struct Map* mp, bool allocated_ptr);
-
-
 struct CerealShell {
     struct Lexer* lxr;
     struct Parser* psr;

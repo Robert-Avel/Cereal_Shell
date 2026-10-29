@@ -10,8 +10,8 @@ OBJ := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC))
 LIB_NAME := libCerealShell.a
 
 
-$(LIB_NAME): $(OBJ)
-	ar rcs $@ $^
+all: $(OBJ)
+	ar rcs $(LIB_NAME) $^
 
 
 obj/%.o: src/%.c
@@ -20,4 +20,4 @@ obj/%.o: src/%.c
 
 
 clear:
-	rm  $(OBJ)
+	rm -f $(OBJ) $(LIB_NAME)

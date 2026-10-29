@@ -7,8 +7,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <ASCIIEscapeColors.h>
 #include <strings.h>
+
+
+
 
 static void printError(int err) {
     switch (err) {
@@ -49,7 +51,7 @@ static void printError(int err) {
 }
 
 
-int Map_init(struct Map* mp, const char* key, WrapperFunction f) {
+static int Map_init(struct Map* mp, const char* key, WrapperFunction f) {
     if(mp == NULL) {return 1;}
 
     mp->key = strdup(key);
@@ -57,7 +59,7 @@ int Map_init(struct Map* mp, const char* key, WrapperFunction f) {
     return 0;
 }
 
-int Map_end(struct Map* mp, bool allocated_ptr) {
+static int Map_end(struct Map* mp, bool allocated_ptr) {
     if(mp == NULL) {return 1;}
 
     free( (void*) mp->key);
@@ -106,7 +108,7 @@ static int CerealShell_expand(struct CerealShell* cs) {
         if(d == NULL) {return 2;}
         cs->reg_fun = d;
     } else {
-        d = realloc(cs->reg_fun, sizeof(struct Lexemas) * (10 + cs->allocated));
+        d = realloc(cs->reg_fun, sizeof(struct Map) * (10 + cs->allocated));
         if(d == NULL) {return 2;}
         cs->reg_fun = d;
     }

@@ -1,6 +1,12 @@
 #include <stdbool.h>
 #include <stdio.h>
-#include <ASCIIEscapeColors.h>
+
+
+#define FG_RED            "\033[31m"
+#define RESET             "\033[0m"
+#define FG_BLUE           "\033[34m"
+#define FG_BRIGHT_RED     "\033[91m"
+
 
 #define CAT(a, b) a##b
 #define CAT2(a, b) CAT(a, b)
