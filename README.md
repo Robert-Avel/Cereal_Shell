@@ -23,8 +23,19 @@ Na raiz do projeto, execute:
 ```sh
 make
 ```
-
 O `Makefile` compila os arquivos de `src/` e empacota os objetos no `libCerealShell.a`.
+
+## Instalação (Linux)
+
+(Opicional)Defina o PREFIX, que por padrão é `/usr/local`, se não definido
+```sh
+export PREFIX="caminho/de/instalação"
+```
+
+e então executar:
+```sh
+sudo make install
+```
 
 ## Uso
 
@@ -65,6 +76,8 @@ int main(void)
     return 0;
 }
 ```
+
+> Obs: Em C++, utilizar `extern "C" { #include <CerealShell.h> }`
 
 O wrapper gerado por `FUNCTION_NEW` imprime o retorno da funcao. Para callbacks sem retorno, o cabecalho `Wrapper.h` tambem define `FUNCTION_NEW_VOID`.
 
