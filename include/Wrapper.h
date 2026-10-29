@@ -1,11 +1,10 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-
 #define FG_RED            "\033[31m"
 #define RESET             "\033[0m"
 #define FG_BLUE           "\033[34m"
-#define FG_BRIGHT_RED     "\033[91m"
+#define FG_BRIGHT_RED     "\033[31m"
 
 
 #define CAT(a, b) a##b
@@ -49,6 +48,16 @@
     if( a##pos == NULL) {printf(FG_BRIGHT_RED "ARG "_TOSTR(pos)" NOT FOUND" RESET "\n"); return;} \
 
 
+#define _ARG_NAMED(name) \
+    const struct NArgToken* a##pos = Function_getArgNamed(f, #name); \
+    if( a##pos == NULL) {printf(FG_BRIGHT_RED "ARG "#name" NOT FOUND" RESET "\n"); return;} \
+
+
+#define _VAR_NAMED(name, type) \
+    const _TYPE_EXTEND_ENUM(type) * b##name = CAT2( NArgToken_getArg_, _TYPE_COLAPSE_ENUM(type)) (a##pos); \
+    if( b##name == NULL ) {printf(FG_BRIGHT_RED "ARG "#name" TYPE INVALID" RESET "\n"); return;} \
+    const _TYPE_EXTEND_ENUM(type) c##name = *b##name;
+
 #define _VAR_POSITIONAL(pos, type) \
     const _TYPE_EXTEND_ENUM(type) * b##pos = CAT2( NArgToken_getArg_, _TYPE_COLAPSE_ENUM(type)) (a##pos); \
     if( b##pos == NULL ) {printf(FG_BRIGHT_RED "ARG "_TOSTR(pos)" TYPE INVALID" RESET "\n"); return;} \
@@ -63,7 +72,12 @@
     printf(_TYPE_FORMAT_ENUM(type)"\n", function_name caller) \
 
 
-#define ARG_ASSEMBLY(pos, type) \
+#define ARG_ASSEMBLY_NAMED(name, type) \
+    _ARG_NAMED(name) \
+    _VAR_NAMED(name, type) \
+
+
+#define ARG_ASSEMBLY_POS(pos, type) \
     _ARG_POSITIONAL(pos) \
     _VAR_POSITIONAL(pos, type) \
 
@@ -76,7 +90,7 @@
     }
 
 
-#define FUNCTION_NEW_VOID(function_name, n_args, caller, args...) \
+#define VOID_FUNCTION_NEW(function_name, n_args, caller, args...) \
     void __outCShell##function_name(const struct Function* f) { \
     _ARGS_CHECHER( n_args) \
     args \
