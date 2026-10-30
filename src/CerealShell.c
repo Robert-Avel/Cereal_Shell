@@ -77,8 +77,12 @@ struct CerealShell* CerealShell_new() {
     cs->lxr = Lexer_new();
     if(cs->lxr == NULL) {return NULL;}
     cs->psr = Parser_new();
-    if(cs->psr == NULL) {return NULL;}
+    if(cs->psr == NULL) {
+        Lexer_end(cs->lxr);
+        return NULL;
+    }
 
+    cs->reg_fun = NULL;
     cs->allocated = 0;
     cs->size = 0;
     return cs;
@@ -90,6 +94,7 @@ int CerealShell_end(struct CerealShell* cs) {
     for(size_t i = 0; i < cs->size; i++) {
         Map_end(cs->reg_fun + i, false);
     }
+    free(cs->reg_fun);
     Lexer_end(cs->lxr);
     Parser_end(cs->psr);
     free(cs);
@@ -148,24 +153,30 @@ const struct Map* CerealShell_getFunction(struct CerealShell* cs, const char* ke
 int CerealShell_reset(struct CerealShell* cs) {
     if(cs == NULL) {return 1;}
 
-    Parser_end(cs->psr);
-    cs->psr = Parser_new();
-    Lexer_end(cs->lxr);
-    cs->lxr = Lexer_new();
+    Parser_reset(cs->psr);
+    Lexer_clear(cs->lxr);
     return 0;
 }
 
 
-static int __CerealShell_start(struct CerealShell* cs, const char* input) {
+int CerealShell_start(struct CerealShell* cs, const char* input) {
     int status;
+
+    if(cs == NULL || input == NULL) {return FAIL;}
+    if(input[0] == '\n') {return 12;}
+
     status = Lexer_setInput(cs->lxr, input);
     if(status != 0) {return status;}
+    printf("Lexer Inputed\n");
 
     status = Lexer_start(cs->lxr);
     if(status != 0) {return status;}
+    printf("Lexer ended\n");
 
     status = Parser_Start(cs->psr, cs->lxr);
     if(status != 0) {return status;}
+    printf("Parser ended\n");
+
 
     struct Function* fncs = cs->psr->functions;
     for(size_t i = 0; i < cs->psr->size; i++) {
@@ -179,21 +190,16 @@ static int __CerealShell_start(struct CerealShell* cs, const char* input) {
     return 0;
 }
 
-int CerealShell_start(struct CerealShell* cs, const char* input) {
-    int status;
-    if(strlen(input) == 0) {return 12;}
-    status = __CerealShell_start(cs, input);
-    CerealShell_reset(cs);
-    return status;
-}
-
 
 void CerealShell_initLoop(struct CerealShell* cs) {
     size_t ss = 0;
     char* inp = NULL;
     while (1) {
         printf(FG_BLUE CEREAL_INPUT_HEAD RESET);
-        getline(&inp, &ss, stdin);
+        if(getline(&inp, &ss, stdin) < 0) {
+            free(inp);
+            return;
+        }
 
         int end = CerealShell_start(cs, inp);
         if(end > 0) {printError(end);}

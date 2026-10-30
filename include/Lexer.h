@@ -42,7 +42,6 @@ int Lexer_expand(struct Lexer* l);
 int Lexer_newLexemas(struct Lexer* l, enum LexerToken type, const char* var, size_t size);
 
 int Lexer_clear(struct Lexer* l);
-int Lexer_stepCursor(struct Lexer* l);
 int Lexer_setInput(struct Lexer* l, const char* input);
 
 int Lexer_start(struct Lexer* l);

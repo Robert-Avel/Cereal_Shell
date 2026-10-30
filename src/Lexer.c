@@ -7,6 +7,11 @@
 #include <strings.h>
 
 
+static bool Lexer_isDelimiter(unsigned char c) {
+    return c == '\0' || c == ' ' || c == ';' || c == '-' || c == '\n';
+}
+
+
 int Lexemas_init(struct Lexemas* lex, enum LexerToken type, const char* var, size_t size) {
     if(lex == NULL) {return 1;}
 
@@ -54,12 +59,15 @@ int Lexer_expand(struct Lexer* l) {
     struct Lexemas* d;
     if(l->lxmas == NULL)
     {
-        d = malloc(sizeof(struct Lexemas) * 10);
+        d = calloc(10, sizeof(struct Lexemas));
         if(d == NULL) {return 2;}
         l->lxmas = d;
     } else {
-        d = realloc(l->lxmas, sizeof(struct Lexemas) * (10 + l->allocated));
+        size_t new_allocated = l->allocated + 10;
+        d = calloc(new_allocated, sizeof(struct Lexemas));
         if(d == NULL) {return 2;}
+        memcpy(d, l->lxmas, sizeof(struct Lexemas) * l->size);
+        free(l->lxmas);
         l->lxmas = d;
     }
     l->allocated += 10;
@@ -91,6 +99,7 @@ int Lexer_end(struct Lexer* l) {
         Lexemas_reset(&l->lxmas[i]);
     }
     free(l->lxmas);
+    free((char*) l->input);
     free(l);
     return 0;
 }
@@ -101,20 +110,14 @@ int Lexer_clear(struct Lexer* l) {
     for(size_t i = 0; i < l->size; i++) {
         Lexemas_reset(&l->lxmas[i]);
     }
-    if(l->lxmas != NULL) {free(l->lxmas);}
+    free(l->lxmas);
+    l->lxmas = NULL;
     l->allocated = 0;
     l->size = 0;
 
-    if(l->input != NULL) {free((char*) l->input);}
+    free((char*) l->input);
+    l->input = NULL;
     l->cursor = 0;
-    return 0;
-}
-
-int Lexer_stepCursor(struct Lexer* l) {
-    if (l == NULL) {return 1;}
-    if(l->input == NULL) {return 2;}
-
-    l->cursor++;
     return 0;
 }
 
@@ -130,7 +133,7 @@ int Lexer_setInput(struct Lexer* l, const char* input) {
     return 0;
 }
 
-const char* Lexer_char(struct Lexer* l) {
+static const char* Lexer_char(struct Lexer* l) {
     return l->input + l->cursor;
 }
 
@@ -152,7 +155,7 @@ void Lexer_TextLoop(struct Lexer* l, bool in_quotes) {
             }
         }
         else {
-            if(*Lexer_char(l) == '\0' || *Lexer_char(l) == ' ' || *Lexer_char(l) == ';'|| *Lexer_char(l) == '-' || *Lexer_char(l) == '\n') {
+            if(Lexer_isDelimiter((unsigned char)*Lexer_char(l))) {
                 if(l->cursor - mark == 4 && strncmp(l->input + mark, "true", 4) == 0) {
                     Lexer_newLexemas(l, T_TRUE, NULL, 0);
                 }
@@ -177,7 +180,7 @@ void Lexer_IntegerLoop(struct Lexer* l) {
     size_t mark = l->cursor;
 
     while(1) {
-        if(*Lexer_char(l) == ' ' || *Lexer_char(l) == '\0' || *Lexer_char(l) == ';' || *Lexer_char(l) == '\n') {
+        if(Lexer_isDelimiter((unsigned char)*Lexer_char(l))) {
             Lexer_newLexemas(l, T_NUM, l->input + mark, l->cursor - mark);
             return;
         }
@@ -186,7 +189,7 @@ void Lexer_IntegerLoop(struct Lexer* l) {
             l->cursor++;
             return;
         }
-        else if(!isdigit(*Lexer_char(l))) {
+        else if(!isdigit((unsigned char)*Lexer_char(l))) {
             Lexer_newLexemas(l, T_NULL, NULL, 0);
         }
         l->cursor++;
@@ -214,11 +217,11 @@ int Lexer_start(struct Lexer* l) {
             Lexer_newLexemas(l, T_EOF, NULL, 0);
             break;
         }
-        else if(*Lexer_char(l) == '"' || isalpha(*Lexer_char(l))) {
+        else if(*Lexer_char(l) == '"' || isalpha((unsigned char)*Lexer_char(l))) {
             Lexer_TextLoop(l, *Lexer_char(l) == '"');
             continue;
         }
-        else if(isdigit(*Lexer_char(l))) {
+        else if(isdigit((unsigned char)*Lexer_char(l))) {
             Lexer_IntegerLoop(l);
             continue;
         }

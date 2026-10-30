@@ -36,6 +36,7 @@ int _Parser_KeyArgAnalyze(struct Function* fn, struct Lexemas* lxm, size_t* curs
 void _Parser_NegativeNum(struct Function* fn, struct Lexemas* lxm, size_t* cursor, position* i_p);
 int _Parser_FunctionLoop(struct Parser* p, struct Lexer* lx, size_t* cursor);
 int Parser_Start(struct Parser* p, struct Lexer* lx);
+int Parser_reset(struct Parser* p);
 enum LexerToken peek(const struct Lexemas* lxm);
 enum LexerToken peekNext(const struct Lexemas* lxm);
 int Parser_end(struct Parser* p);

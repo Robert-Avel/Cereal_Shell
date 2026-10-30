@@ -25,7 +25,7 @@ int Parser_expand(struct Parser* p) {
         p->functions = malloc(sizeof(struct Function) * 10);
         if(p->functions == NULL) {return 1;}
     } else {
-        struct Function* n_c = realloc(p->functions, sizeof(struct Function) * p->allocated + 10);
+        struct Function* n_c = realloc(p->functions, sizeof(struct Function) * (p->allocated + 10));
         if(n_c == NULL) {return 1;}
         p->functions = n_c;
     }
@@ -187,9 +187,11 @@ int _Parser_FunctionLoop(struct Parser* p, struct Lexer* lx, size_t* cursor) {
 int Parser_reset(struct Parser* p) {
     if(p == NULL) {return FAIL;}
     for(size_t i = 0; i < p->size; i++) {
-        Function_end((p + i)->functions, false);
+        Function_end((p->functions + i), false);
     }
-    free(p->functions);
+    if(p->functions != NULL) {
+        free(p->functions);
+    }
 
     p->functions = NULL;
     p->allocated = 0;
