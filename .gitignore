@@ -1,8 +1,8 @@
 *.txt
 *.clangd
 test
-test.c
-test2.c
+test.*
+test2.*
 obj
 *.a
 *.o

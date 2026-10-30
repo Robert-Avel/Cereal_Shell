@@ -1,8 +1,9 @@
-#ifndef NARGTOKEM_HPP
-#define NARGTOKEM_HPP
+#ifndef NARGTOKEM_H
+#define NARGTOKEM_H
 
 #include <stdbool.h>
 #include <stdlib.h>
+
 
 #define _SET_ARG_SIGN(type, func_ext)                                \
     type* NArgToken_getArg_##func_ext (const struct NArgToken* nat)
@@ -19,7 +20,7 @@ typedef unsigned int position;
 enum KeyType {
     NONE,
     POSITIONAL,
-    NAMED
+    NAME
 };
 
 union Key {

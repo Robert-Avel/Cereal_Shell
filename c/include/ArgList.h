@@ -1,5 +1,5 @@
-#ifndef ARGLIST_HPP
-#define ARGLIST_HPP
+#ifndef ARGLIST_H
+#define ARGLIST_H
 
 
 #include "ArgToken2.h"
