@@ -52,4 +52,4 @@ uninstall:
 
 
 test_cpp:
-	$(CXX) test.cpp $(SRC_CPP) $(COMPILE_FLAGS_CPP)  -o test_cpp
+	$(CXX) test.cpp $(SRC_CPP) $(COMPILE_FLAGS_CPP)  -o test_cpp -g

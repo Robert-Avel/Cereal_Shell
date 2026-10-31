@@ -1,3 +1,6 @@
+#ifndef LEXER_HPP
+#define LEXER_HPP
+
 #include <optional>
 #include <string>
 #include <vector>
@@ -13,8 +16,8 @@ namespace cs
         T_SEMI_COLON, // ';'    4
         T_EOF, //on '\0'        5
         T_TRUE, // boolean 1    6
-        T_FALSE, // boolean 0    7
-        T_UNSIGNED_NUM
+        T_FALSE, // boolean 0   7
+        T_UNSIGNED_NUM //       8
     };
 
 
@@ -27,22 +30,34 @@ namespace cs
             Lexemas(LexemasToken lt_, std::string var_): lt(lt_), var(var_) {}
             Lexemas(LexemasToken lt_): lt(lt_) {}
 
-            const LexemasToken& getToken() {return lt;}
+            const LexemasToken& getToken() const {return lt;}
 
-            const std::string* getVar()
+            const std::string* getVar() const
             {return var.has_value() ? &var.value() : NULL;}
     };
 
+    using LexemasVctr = std::vector<Lexemas>;
 
     class Lexer {
-        std::vector<Lexemas> lxmas;
+        LexemasVctr lxmas;
 
+        std::string input;
+        std::string::const_iterator cursor;
+
+        void QuotesTextLoop();
+        void LiteralTextLoop();
+        void IntegerLoop();
         public:
-            Lexer();
-            Lexer(std::string input) {start(input);};
+            Lexer() = delete;
+            Lexer(std::string& input) {setInput(input);};
 
             void clear();
-            int start(std::string input);
-            const std::vector<Lexemas>& getLexemas();
+            void setInput(const std::string& input);
+            int start();
+            std::vector<Lexemas>& getLexemas();
+            void newLexemas(LexemasToken lt_, std::string var_);
+            void newLexemas(LexemasToken lt_);
     };
 }
+
+#endif

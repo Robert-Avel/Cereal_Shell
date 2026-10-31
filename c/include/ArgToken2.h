@@ -20,7 +20,7 @@ typedef unsigned int position;
 enum KeyType {
     NONE,
     POSITIONAL,
-    NAME
+    NAMED
 };
 
 union Key {

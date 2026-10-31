@@ -1,94 +1,140 @@
 #include "Lexer.hpp"
+#include <string>
 
 
-void Lexer_TextLoop(struct Lexer* l, bool in_quotes) {
-    if(in_quotes) {l->cursor++;}
-    size_t mark = l->cursor;
+std::vector<cs::Lexemas>& cs::Lexer::getLexemas() {
+    return lxmas;
+}
 
-    while(1) {
-        if(in_quotes) {
-            if (*Lexer_char(l) == '"') {
-                Lexer_newLexemas(l, T_TEXT, l->input + mark, l->cursor - mark);
-                l->cursor++;
-                return;
-            }
-            else if (*Lexer_char(l) == '\0') {
-                Lexer_newLexemas(l, T_NULL, NULL, 0);
-                return;
-            }
+
+void cs::Lexer::setInput(const std::string& input_) {
+    lxmas.clear();
+    this->input = input_;
+    this->cursor = this->input.cbegin();
+}
+
+
+static const char ichar(std::string::const_iterator& cursor) {
+    return *cursor.base();
+}
+
+
+void cs::Lexer::newLexemas(LexemasToken lt_, std::string var_) {
+    this->lxmas.push_back({lt_, var_});
+}
+
+void cs::Lexer::newLexemas(LexemasToken lt_) {
+    this->lxmas.push_back({lt_});
+}
+
+
+void cs::Lexer::QuotesTextLoop() {
+    cursor++;
+    auto mark = cursor;
+
+    while (cursor != input.cend()) {
+        if (ichar(cursor) == '"') {
+            newLexemas(T_TEXT, {mark, cursor});
+            cursor++;
+            return;
         }
-        else {
-            if(Lexer_isDelimiter((unsigned char)*Lexer_char(l))) {
-                if(l->cursor - mark == 4 && strncmp(l->input + mark, "true", 4) == 0) {
-                    Lexer_newLexemas(l, T_TRUE, NULL, 0);
-                }
-                else if(l->cursor - mark == 5 && strncmp(l->input + mark, "false", 5) == 0) {
-                    Lexer_newLexemas(l, T_FALSE, NULL, 0);
-                }
-                else Lexer_newLexemas(l, T_TEXT, l->input + mark, l->cursor - mark);
-                return;
-            }
-            else if (*Lexer_char(l) == '"') {
-                Lexer_newLexemas(l, T_NULL, NULL, 0);
-                l->cursor++;
-                return;
-            }
+        else if (ichar(cursor) == '\0') {
+            newLexemas(T_NULL);
+            return;
         }
-        l->cursor++;
+        cursor++;
     }
 }
 
 
-void Lexer_IntegerLoop(struct Lexer* l) {
-    size_t mark = l->cursor;
+void cs::Lexer::LiteralTextLoop() {
+    auto mark = cursor;
 
-    while(1) {
-        if(Lexer_isDelimiter((unsigned char)*Lexer_char(l))) {
-            Lexer_newLexemas(l, T_NUM, l->input + mark, l->cursor - mark);
-            return;
+    while (cursor != input.cend()) {
+        switch (ichar(cursor)) {
+            case '"':
+                newLexemas(T_NULL);
+                cursor++;
+                return;
+            case ' ':
+            case '\n':
+            case '-':
+            case ';':
+            case '\0':
+                std::string tmp = {mark, cursor};
+                if( tmp == "true") {
+                    newLexemas(T_TRUE);
+                    return;
+                } else if(tmp == "false") {
+                    newLexemas(T_FALSE);
+                    return;
+                } else {
+                    newLexemas(T_TEXT, tmp);
+                    return;
+                }
         }
-        else if(*Lexer_char(l) == 'U') {
-            Lexer_newLexemas(l, T_UNSIGNED_NUM, l->input + mark, l->cursor - mark);
-            l->cursor++;
-            return;
+        cursor++;
+    }
+}
+
+void cs::Lexer::IntegerLoop() {
+    auto mark = cursor;
+
+    while (cursor != input.cend()) {
+        switch (ichar(cursor)) {
+            case ' ':
+            case '\n':
+            case '-':
+            case ';':
+            case '\0':
+            case '"':
+                newLexemas(LexemasToken::T_NUM, {mark, cursor});
+                return;
+            case 'U':
+                newLexemas(LexemasToken::T_UNSIGNED_NUM, {mark, cursor});
+                return;
+            default:
+                if(!isdigit(ichar(cursor))) {
+                    newLexemas(LexemasToken::T_NULL);
+                    return;
+                }
         }
-        else if(!isdigit((unsigned char)*Lexer_char(l))) {
-            Lexer_newLexemas(l, T_NULL, NULL, 0);
-        }
-        l->cursor++;
+        cursor++;
     }
 }
 
 
-int cs::Lexer::start(std::string input) {
-    if(l == NULL) {return 1;}
-    if(l->cursor != 0) {return 2;}
+int cs::Lexer::start() {
+    if(cursor != input.cbegin()) {return -1;}
 
+    while(cursor != input.cend()) {
+        switch (ichar(cursor)) {
+            case ' ':
+            case '\n':
+                break;
+            case '-':
+                newLexemas(T_DASH);
+                break;
+            case ';':
+                newLexemas(T_SEMI_COLON);
+                break;
+            case '"':
+                QuotesTextLoop();
+                continue;
+            default:
+                if(isalpha(ichar(cursor))) {
+                    LiteralTextLoop();
+                    continue;
+                }
+                else if (isdigit(ichar(cursor))) {
+                    IntegerLoop();
+                    continue;
+                }
+                else continue;
+        }
+        cursor++;
+    };
 
-    do {
-        if(*Lexer_char(l) == ' '|| *Lexer_char(l) == '\n') {
-            l->cursor++;
-            continue;
-        }
-        if(*Lexer_char(l) == '-') {
-            Lexer_newLexemas(l, T_DASH, NULL, 0);
-        }
-        else if(*Lexer_char(l) == ';') {
-            Lexer_newLexemas(l, T_SEMI_COLON, NULL, 0);
-        }
-        else if (*Lexer_char(l) == '\0') {
-            Lexer_newLexemas(l, T_EOF, NULL, 0);
-            break;
-        }
-        else if(*Lexer_char(l) == '"' || isalpha((unsigned char)*Lexer_char(l))) {
-            Lexer_TextLoop(l, *Lexer_char(l) == '"');
-            continue;
-        }
-        else if(isdigit((unsigned char)*Lexer_char(l))) {
-            Lexer_IntegerLoop(l);
-            continue;
-        }
-        l->cursor++;
-    } while(1);
+    newLexemas(T_EOF);
     return 0;
 }
