@@ -1,7 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
-
-struct Function;
+#include "Function.h"
 
 typedef void (*WrapperFunction) (const struct Function*);
 typedef unsigned int position;

@@ -14,6 +14,13 @@ OBJ_DIR := obj
 OBJ_C := $(patsubst $(SRC_C_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC_C))
 OBJ_CPP := $(patsubst $(SRC_CPP_DIR)/%.cpp, $(OBJ_DIR)/%+.o, $(SRC_CPP))
 
+
+P_HEADER_C := Wrapper.h CerealShell.h Function.h ArgToken2.h ArgList.h
+P_HEADER_CPP := Wrapper.hpp CerealShell.hpp Function.hpp PStatus.hpp ArgToken2.hpp
+
+P_HEADER_CPP_PATH := $(patsubst %.hpp, cpp/include/%.hpp, $(P_HEADER_CPP))
+P_HEADER_C_PATH := $(patsubst %.h, c/include/%.h, $(P_HEADER_C))
+
 LIB_OBJ := libCerealShell.a
 LIB_NAME := CerealShell
 
@@ -38,10 +45,11 @@ clear: $(LIB_OBJ)
 	rm -f -r $(OBJ_DIR)
 	rm -f $(LIB_OBJ)
 
+
 .PHONY: install
 install: $(LIB_OBJ)
 	install -d $(PREFIX)/include/$(LIB_NAME)
-	install -m 644 include/*.h $(PREFIX)/include/$(LIB_NAME)/
+	install -m 644 $(P_HEADER_CPP_PATH) $(P_HEADER_C_PATH) $(PREFIX)/include/$(LIB_NAME)/
 	install -m 644 $(LIB_OBJ) $(PREFIX)/lib/
 
 
