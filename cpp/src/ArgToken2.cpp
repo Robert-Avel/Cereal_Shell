@@ -10,22 +10,22 @@
 
 
 void cs::ArgToken::setVar(cs::ArgVar v) {value = v;}
-long* cs::ArgToken::getArg_l () {
+const long* cs::ArgToken::getArg_l () const {
     _GETTTER_BODY(long)
 }
-unsigned long* cs::ArgToken::getArg_ul () {
+const unsigned long* cs::ArgToken::getArg_ul () const {
     _GETTTER_BODY(unsigned long)
 }
-std::string* cs::ArgToken::getArg_cc () {
+const std::string* cs::ArgToken::getArg_cc () const {
     _GETTTER_BODY(std::string)
 }
-bool* cs::ArgToken::getArg_b () {
+const bool* cs::ArgToken::getArg_b () const {
     _GETTTER_BODY(bool)
 }
 
 
 void cs::NamedArgToken::setKey(std::string k) {key = k;}
-const std::string& cs::NamedArgToken::getKey() {return key;}
+const std::string& cs::NamedArgToken::getKey() const {return key;}
 
 void cs::PositionalArgToken::setKey(position k) {key = k;}
-const cs::position& cs::PositionalArgToken::getKey() {return key;}
+const cs::position& cs::PositionalArgToken::getKey() const {return key;}

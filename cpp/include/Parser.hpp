@@ -17,7 +17,10 @@ namespace cs
         EXPECTED_SEMI_COLON, //      4
         KW_ARGS_ONLY_ERROR, //       5
         EXPECTED_EXPRESSION, //      6
-        DASH_WITH_UNSIGNED //        7
+        DASH_WITH_UNSIGNED, //        7
+        NOT_FOUND,
+        FUNCTION_NULL,
+        NO_INPUT
     };
 
     class Parser {

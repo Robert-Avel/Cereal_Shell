@@ -1,6 +1,7 @@
 *.txt
 *.clangd
 test
+test_cpp
 test.*
 test2.*
 obj

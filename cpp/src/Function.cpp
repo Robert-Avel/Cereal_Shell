@@ -27,8 +27,8 @@ const cs::PositionalArgToken* cs::Function::getPositionalArg(cs::position pos) c
     return &posal[pos];
 }
 
-const cs::NamedArgToken* cs::Function::getNamedArg(std::string& name) const {
-    if(namal.find(name) == namal.end()) {
+const cs::NamedArgToken* cs::Function::getNamedArg(std::string name) const {
+    if(namal.find(name) != namal.end()) {
         return &namal.at(name);
     } else return nullptr;
 }

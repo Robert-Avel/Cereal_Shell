@@ -2,6 +2,7 @@
 #define FUNCTION_HPP
 
 #include "ArgToken2.hpp"
+#include <cstddef>
 #include <string>
 
 
@@ -23,7 +24,8 @@ namespace cs {
             const cs::PositionalArgList& getPosal() const {return posal;}
             const cs::NamedArgList& getNamal() const {return namal;}
             const cs::PositionalArgToken* getPositionalArg(cs::position pos) const;
-            const cs::NamedArgToken* getNamedArg(std::string& name) const;
+            const cs::NamedArgToken* getNamedArg(std::string name) const;
+            size_t size() const {return posal.size() + namal.size();}
     };
 }
 

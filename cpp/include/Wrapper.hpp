@@ -1,5 +1,3 @@
-#include <stdbool.h>
-#include <stdio.h>
 
 #define FG_RED            "\033[31m"
 #define RESET             "\033[0m"
@@ -12,7 +10,7 @@
 
 
 #define _BOOL_E bool
-#define _STRING_E char* const
+#define _STRING_E std::string
 #define _LONG_E long
 #define _UNSIGNED_LONG_E unsigned long
 
@@ -35,41 +33,39 @@
 
 #define _TOSTR(n) #n
 
-#define _NULL_CHECK \
-    if(f == NULL) {printf(FG_BRIGHT_RED "FUNCTION ERROR\n" RESET); return;} //checagem Basica
-
 
 #define _ARGS_CHECHER( n_args ) \
-    if(f->args->size != n_args)    \
-    {printf(FG_BRIGHT_RED "ARGS DIVERGENCES\n" RESET); return;}
+    if(f.size() != n_args)    \
+    {std::cout << FG_BRIGHT_RED << "ARGS DIVERGENCES\n" << RESET; return;}
 
 #define _ARG_POSITIONAL(pos) \
-    const struct NArgToken* a##pos = Function_getArgPositional(f, pos); \
-    if( a##pos == NULL) {printf(FG_BRIGHT_RED "ARG "_TOSTR(pos)" NOT FOUND" RESET "\n"); return;} \
+    const cs::PositionalArgToken* a##pos = f.getPositionalArg(pos); \
+    if( a##pos == nullptr ) {std::cout << FG_BRIGHT_RED << "ARG " << _TOSTR(pos) << " NOT FOUND" << RESET << "\n"; return;} \
 
 
 #define _ARG_NAMED(name) \
-    const struct NArgToken* a##pos = Function_getArgNamed(f, #name); \
-    if( a##pos == NULL) {printf(FG_BRIGHT_RED "ARG "#name" NOT FOUND" RESET "\n"); return;} \
+    const cs::NamedArgToken* a##name = f.getNamedArg( #name ); \
+    if( a##name == nullptr ) {std::cout << FG_BRIGHT_RED << "ARG " << #name << " NOT FOUND" << RESET << "\n"; return;} \
 
 
 #define _VAR_NAMED(name, type) \
-    const _TYPE_EXTEND_ENUM(type) * b##name = CAT2( NArgToken_getArg_, _TYPE_COLAPSE_ENUM(type)) (a##pos); \
-    if( b##name == NULL ) {printf(FG_BRIGHT_RED "ARG "#name" TYPE INVALID" RESET "\n"); return;} \
+    const _TYPE_EXTEND_ENUM(type) * b##name = CAT2( a##name ->getArg_ , _TYPE_COLAPSE_ENUM(type)) (); \
+    if( b##name == nullptr ) {std::cout << FG_BRIGHT_RED << "ARG " << #name << " TYPE INVALID" << RESET << "\n"; return;} \
     const _TYPE_EXTEND_ENUM(type) c##name = *b##name;
 
 #define _VAR_POSITIONAL(pos, type) \
-    const _TYPE_EXTEND_ENUM(type) * b##pos = CAT2( NArgToken_getArg_, _TYPE_COLAPSE_ENUM(type)) (a##pos); \
-    if( b##pos == NULL ) {printf(FG_BRIGHT_RED "ARG "_TOSTR(pos)" TYPE INVALID" RESET "\n"); return;} \
+    const _TYPE_EXTEND_ENUM(type) * b##pos = CAT2( a##pos ->getArg_ , _TYPE_COLAPSE_ENUM(type)) (); \
+    if( b##pos == nullptr ) {std::cout << FG_BRIGHT_RED << "ARG " << _TOSTR(pos) << " TYPE INVALID" << RESET << "\n"; return;} \
     const _TYPE_EXTEND_ENUM(type) c##pos = *b##pos;
 
 
 #define _RETURNER_VOID(function_name, caller) \
-    function_name caller; printf("OK, No Return!\n");  \
+    function_name caller; std::cout << "OK, No Return!\n";  \
 
 
 #define _RETURNER(type, function_name, caller) \
-    printf(_TYPE_FORMAT_ENUM(type)"\n", function_name caller) \
+    const _TYPE_EXTEND_ENUM(type) r = function_name caller ;  \
+    std::cout << r << '\n'; \
 
 
 #define ARG_ASSEMBLY_NAMED(name, type) \
@@ -83,7 +79,7 @@
 
 
 #define FUNCTION_NEW(function_name, return_type, n_args, caller, args...) \
-    void __outCShell##function_name(const struct Function* f) { \
+    void function_name##__outCShell(const cs::Function& f) { \
     _ARGS_CHECHER( n_args) \
     args \
     _RETURNER(return_type, function_name, caller); \
@@ -91,8 +87,8 @@
 
 
 #define VOID_FUNCTION_NEW(function_name, n_args, caller, args...) \
-    void __outCShell##function_name(const struct Function* f) { \
+    void function_name##__outCShell(const cs::Function& f) { \
     _ARGS_CHECHER( n_args) \
     args \
-    _RETURNER_VOID(function_name, caller); \
+    _RETURNER_VOID(function_name, caller) \
     }

@@ -20,10 +20,10 @@ namespace cs {
             ArgToken(cs::ArgVar value_): value(value_) {}
             void setVar(cs::ArgVar v);
 
-            long* getArg_l ();
-            unsigned long* getArg_ul ();
-            std::string* getArg_cc ();
-            bool* getArg_b ();
+            const long* getArg_l () const;
+            const unsigned long* getArg_ul () const;
+            const std::string* getArg_cc () const;
+            const bool* getArg_b () const;
     };
 
 
@@ -36,7 +36,7 @@ namespace cs {
             ArgToken(value_), key(key_) {}
 
             void setKey(std::string k);
-            const std::string& getKey();
+            const std::string& getKey() const;
     };
 
 
@@ -49,7 +49,7 @@ namespace cs {
             ArgToken(value_), key(key_) {}
 
             void setKey(cs::position k);
-            const cs::position& getKey();
+            const cs::position& getKey() const;
     };
 
     using PositionalArgList = std::vector<cs::PositionalArgToken>;
