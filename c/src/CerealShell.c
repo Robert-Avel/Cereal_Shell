@@ -74,14 +74,6 @@ struct CerealShell* CerealShell_new() {
     struct CerealShell* cs = malloc(sizeof(struct CerealShell));
     if (cs == NULL) {return NULL;}
 
-    cs->lxr = Lexer_new();
-    if(cs->lxr == NULL) {return NULL;}
-    cs->psr = Parser_new();
-    if(cs->psr == NULL) {
-        Lexer_end(cs->lxr);
-        return NULL;
-    }
-
     cs->reg_fun = NULL;
     cs->allocated = 0;
     cs->size = 0;
@@ -95,8 +87,6 @@ int CerealShell_end(struct CerealShell* cs) {
         Map_end(cs->reg_fun + i, false);
     }
     free(cs->reg_fun);
-    Lexer_end(cs->lxr);
-    Parser_end(cs->psr);
     free(cs);
     return 0;
 }
@@ -150,36 +140,24 @@ const struct Map* CerealShell_getFunction(struct CerealShell* cs, const char* ke
 }
 
 
-int CerealShell_reset(struct CerealShell* cs) {
-    if(cs == NULL) {return 1;}
-
-    Parser_reset(cs->psr);
-    Lexer_clear(cs->lxr);
-    return 0;
-}
-
-
-int CerealShell_start(struct CerealShell* cs, const char* input) {
+static int __CerealShell_start(struct CerealShell* cs, const char* input, struct Parser* psr, struct Lexer* lxr) {
     int status;
-
-    if(cs == NULL || input == NULL) {return FAIL;}
+    if(!cs || !input || !lxr || !psr) {return FAIL;}
     if(input[0] == '\n') {return 12;}
 
-    status = Lexer_setInput(cs->lxr, input);
+
+    status = Lexer_setInput(lxr, input);
     if(status != 0) {return status;}
-    printf("Lexer Inputed\n");
 
-    status = Lexer_start(cs->lxr);
+    status = Lexer_start(lxr);
     if(status != 0) {return status;}
-    printf("Lexer ended\n");
 
-    status = Parser_Start(cs->psr, cs->lxr);
+    status = Parser_Start(psr, lxr);
     if(status != 0) {return status;}
-    printf("Parser ended\n");
 
 
-    struct Function* fncs = cs->psr->functions;
-    for(size_t i = 0; i < cs->psr->size; i++) {
+    struct Function* fncs = psr->functions;
+    for(size_t i = 0; i < psr->size; i++) {
         const struct Map* fmap = CerealShell_getFunction(cs, fncs[i].name);
         if(fmap != NULL) {
             if(fmap->wf == NULL) {return 11;}
@@ -188,6 +166,17 @@ int CerealShell_start(struct CerealShell* cs, const char* input) {
         else {return 10;}
     }
     return 0;
+}
+
+int CerealShell_start(struct CerealShell* cs, const char* input) {
+    struct Lexer* lxr = Lexer_new();
+    struct Parser* psr = Parser_new();
+
+    int status = __CerealShell_start(cs, input, psr, lxr);
+
+    Lexer_end(lxr);
+    Parser_end(psr);
+    return status;
 }
 
 

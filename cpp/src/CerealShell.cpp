@@ -1,3 +1,4 @@
+#include "Function.hpp"
 #include "CerealShell.hpp"
 #include "Lexer.hpp"
 #include "Parser.hpp"
@@ -66,10 +67,11 @@ cs::PStatus cs::CerealShell::CerealShell_start(std::string input) {
     cs::Lexer lxr(input);
     lxr.start();
 
-    auto r =this->psr.start(lxr.getLexemas());
+    cs::Parser psr;
+    auto r = psr.start(lxr.getLexemas());
     if(r != cs::SUCCESS) {return r;}
 
-    for(auto& f: psr.getFunctions()) {
+    for(const cs::Function& f: psr.getFunctions()) {
         cs::WrapperFunction* wf = this->getFunction(f.getName());
         if (wf == nullptr) {return cs::NOT_FOUND;}
         if(*wf == nullptr) {return cs::FUNCTION_NULL;}

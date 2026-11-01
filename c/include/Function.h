@@ -2,7 +2,7 @@
 #define FUNCTION_H
 
 #include "ArgToken2.h"
-#include <ArgList.h>
+#include "ArgList.h"
 #include <stddef.h>
 
 struct Function {

@@ -1,4 +1,3 @@
-
 #define FG_RED            "\033[31m"
 #define RESET             "\033[0m"
 #define FG_BLUE           "\033[34m"
@@ -68,17 +67,17 @@
     std::cout << r << '\n'; \
 
 
-#define ARG_ASSEMBLY_NAMED(name, type) \
+#define CPP_ARG_ASSEMBLY_NAMED(name, type) \
     _ARG_NAMED(name) \
     _VAR_NAMED(name, type) \
 
 
-#define ARG_ASSEMBLY_POS(pos, type) \
+#define CPP_ARG_ASSEMBLY_POS(pos, type) \
     _ARG_POSITIONAL(pos) \
     _VAR_POSITIONAL(pos, type) \
 
 
-#define FUNCTION_NEW(function_name, return_type, n_args, caller, args...) \
+#define CPP_FUNCTION_NEW(function_name, return_type, n_args, caller, args...) \
     void function_name##__outCShell(const cs::Function& f) { \
     _ARGS_CHECHER( n_args) \
     args \
@@ -86,7 +85,7 @@
     }
 
 
-#define VOID_FUNCTION_NEW(function_name, n_args, caller, args...) \
+#define CPP_VOID_FUNCTION_NEW(function_name, n_args, caller, args...) \
     void function_name##__outCShell(const cs::Function& f) { \
     _ARGS_CHECHER( n_args) \
     args \

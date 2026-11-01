@@ -11,8 +11,8 @@ SRC_CPP_DIR := cpp/src
 SRC_CPP := $(shell find $(SRC_CPP_DIR) -name "*.cpp")
 
 OBJ_DIR := obj
-OBJ_C := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC_C_DIR))
-OBJ_CPP := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRC))
+OBJ_C := $(patsubst $(SRC_C_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC_C))
+OBJ_CPP := $(patsubst $(SRC_CPP_DIR)/%.cpp, $(OBJ_DIR)/%+.o, $(SRC_CPP))
 
 LIB_OBJ := libCerealShell.a
 LIB_NAME := CerealShell
@@ -28,7 +28,7 @@ $(OBJ_DIR)/%.o: $(SRC_C_DIR)/%.c
 	$(CC) -c $(COMPILE_FLAGS_C) -o $@ $^
 
 
-$(OBJ_DIR)/%.o: $(SRC_CPP_DIR)/%.cpp
+$(OBJ_DIR)/%+.o: $(SRC_CPP_DIR)/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) -c $(COMPILE_FLAGS_CPP) -o $@ $^
 
@@ -36,7 +36,7 @@ $(OBJ_DIR)/%.o: $(SRC_CPP_DIR)/%.cpp
 .PHONY: clear
 clear: $(LIB_OBJ)
 	rm -f -r $(OBJ_DIR)
-	rm -f $(LIB_NAME)
+	rm -f $(LIB_OBJ)
 
 .PHONY: install
 install: $(LIB_OBJ)
@@ -49,6 +49,10 @@ install: $(LIB_OBJ)
 uninstall:
 	rm -r $(PREFIX)/include/$(LIB_NAME)
 	rm $(PREFIX)/lib/$(LIB_OBJ)
+
+
+test_c:
+	$(CC) test.c $(SRC_C) $(COMPILE_FLAGS_C)  -o test_c -g
 
 
 test_cpp:

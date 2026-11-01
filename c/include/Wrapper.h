@@ -1,6 +1,26 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+struct Function;
+
+typedef void (*WrapperFunction) (const struct Function*);
+typedef unsigned int position;
+
+
+const struct NArgToken* Function_getArgPositional(const struct Function* f, position p);
+const struct NArgToken* Function_getArgNamed(const struct Function* f, const char* p);
+
+
+#define _SET_ARG_SIGN(type, func_ext)                                \
+    type* NArgToken_getArg_##func_ext (const struct NArgToken* nat)
+
+
+_SET_ARG_SIGN(const long,                   l);
+_SET_ARG_SIGN(const unsigned long,         ul);
+_SET_ARG_SIGN(const char* const,           cc);
+_SET_ARG_SIGN(const bool,                   b);
+
+
 #define FG_RED            "\033[31m"
 #define RESET             "\033[0m"
 #define FG_BLUE           "\033[34m"
@@ -72,17 +92,17 @@
     printf(_TYPE_FORMAT_ENUM(type)"\n", function_name caller) \
 
 
-#define ARG_ASSEMBLY_NAMED(name, type) \
+#define C_ARG_ASSEMBLY_NAMED(name, type) \
     _ARG_NAMED(name) \
     _VAR_NAMED(name, type) \
 
 
-#define ARG_ASSEMBLY_POS(pos, type) \
+#define C_ARG_ASSEMBLY_POS(pos, type) \
     _ARG_POSITIONAL(pos) \
     _VAR_POSITIONAL(pos, type) \
 
 
-#define FUNCTION_NEW(function_name, return_type, n_args, caller, args...) \
+#define C_FUNCTION_NEW(function_name, return_type, n_args, caller, args...) \
     void __outCShell##function_name(const struct Function* f) { \
     _ARGS_CHECHER( n_args) \
     args \
@@ -90,7 +110,7 @@
     }
 
 
-#define VOID_FUNCTION_NEW(function_name, n_args, caller, args...) \
+#define C_VOID_FUNCTION_NEW(function_name, n_args, caller, args...) \
     void __outCShell##function_name(const struct Function* f) { \
     _ARGS_CHECHER( n_args) \
     args \

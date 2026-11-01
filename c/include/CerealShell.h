@@ -1,8 +1,6 @@
-#include "Lexer.h"
-#include "Parser.h"
-#include "Function.h"
 #include <stdbool.h>
 #include <stddef.h>
+#include "Wrapper.h"
 
 #define CEREAL_INPUT_HEAD "Cereal_Shell >"
 
@@ -13,8 +11,6 @@
 #define CS_UNSIGNED_LONG UNSIGNED_LONG
 
 
-typedef void (*WrapperFunction) (const struct Function*);
-
 
 struct Map {
     const char* key;
@@ -23,9 +19,6 @@ struct Map {
 
 
 struct CerealShell {
-    struct Lexer* lxr;
-    struct Parser* psr;
-
     struct Map* reg_fun;
     size_t allocated;
     size_t size;
