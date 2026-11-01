@@ -61,7 +61,7 @@ bool cs::CerealShell::newFunction(std::string name, cs::WrapperFunction f) {
     } else return false;
 }
 
-cs::PStatus cs::CerealShell::CerealShell_start(std::string input) {
+cs::PStatus cs::CerealShell::start(std::string input) {
     if(input.empty()) {return cs::NO_INPUT;}
 
     cs::Lexer lxr(input);
@@ -86,7 +86,7 @@ void cs::CerealShell::initLoop() {
         printf(FG_BLUE CEREAL_INPUT_HEAD RESET);
         std::getline(std::cin, in);
 
-        auto end = this->CerealShell_start(in);
+        auto end = this->start(in);
         if(end != cs::SUCCESS) {printError(end);}
     }
 }

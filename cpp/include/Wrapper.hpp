@@ -1,3 +1,7 @@
+#include <iostream>
+#include <string>
+
+
 #define FG_RED            "\033[31m"
 #define RESET             "\033[0m"
 #define FG_BLUE           "\033[34m"

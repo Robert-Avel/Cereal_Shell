@@ -13,6 +13,7 @@ Cereal Shell e uma biblioteca em C para interpretar comandos simples e encaminha
 ## Requisitos
 
 - GCC ou compilador C compativel.
+- G++ ou compilador C++ compativel
 - GNU Make e `ar`.
 
 
@@ -23,7 +24,7 @@ Na raiz do projeto, execute:
 ```sh
 make
 ```
-O `Makefile` compila os arquivos de `src/` e empacota os objetos no `libCerealShell.a`.
+O `Makefile` compila os arquivos de `src` e empacota os objetos no `libCerealShell.a`.
 
 ## Instalação (Linux)
 
@@ -41,22 +42,22 @@ sudo make install
 
 O exemplo abaixo registra uma funcao que soma dois valores `long` e executa um comando:
 
+em C:
 ```c
-#include "CerealShell.h"
-#include "Wrapper.h"
+#include <CerealShell/CerealShell.h>
 
 long soma(long esquerda, long direita)
 {
     return esquerda + direita;
 }
 
-FUNCTION_NEW(
+C_FUNCTION_NEW(
     soma,
     LONG,
     2,
     (c0, c1),
-    ARG_ASSEMBLY(0, LONG)
-    ARG_ASSEMBLY(1, LONG)
+    C_ARG_ASSEMBLY(0, LONG)
+    C_ARG_ASSEMBLY(1, LONG)
 )
 
 int main(void)
@@ -77,7 +78,34 @@ int main(void)
 }
 ```
 
-> Obs: Em C++, utilizar `extern "C" { #include <CerealShell.h> }`
+em C++:
+```cpp
+#include <CerealShell/CerealShell.hpp>
+
+long soma(long esquerda, long direita)
+{
+    return esquerda + direita;
+}
+
+CPP_FUNCTION_NEW(
+    soma,
+    LONG,
+    2,
+    (c0, c1),
+    CPP_ARG_ASSEMBLY(0, LONG)
+    CPP_ARG_ASSEMBLY(1, LONG)
+)
+
+int main(void)
+{
+    cs::CerealShell cs;
+
+    cs.newFunction("printOk", soma__outCShell);
+
+    cs.start("soma 20 22;");
+    return 0;
+}
+```
 
 O wrapper gerado por `FUNCTION_NEW` imprime o retorno da funcao. Para callbacks sem retorno, o cabecalho `Wrapper.h` tambem define `FUNCTION_NEW_VOID`.
 
@@ -101,10 +129,10 @@ Regras observaveis no lexer e no parser:
 - Depois do primeiro argumento nomeado, nao podem vir argumentos posicionais.
 - Cada chamada deve terminar com `;`.
 
-## API principal
+## API principal (C)
 
 - `CerealShell_new()` cria uma instancia do Shell, retornando um ponteiro da instancia `struct CerealShell`.
-- `CerealShell_newFunction(shell, nome, callback)` registra uma função: Wrapper gerada pelo `FUNCTION_NEW()` ou `VOID_FUNCTION_NEW()`.
+- `CerealShell_newFunction(shell, nome, callback)` registra uma função Wrapper gerada pelo `FUNCTION_NEW()` ou `VOID_FUNCTION_NEW()`.
     - `shell` : Ponteiro para a instancia do Shell.
     - `nome` : O nome da função que sistema usa para chamar.
     - `callback` : o endereço da função Wrapper.
@@ -115,6 +143,15 @@ Regras observaveis no lexer e no parser:
     - `shell` : Ponteiro para a instancia do Shell.
 - `CerealShell_end(shell)` libera a instancia.
     - `shell` : Ponteiro para a instancia do Shell.
+
+## API principal (C++)
+- `CerealShell` Classe principal do Shell
+    - `newFunction(name, f)`: registra uma função:
+        - `name` : O nome da função que sistema usa para chamar.
+        - `f` : o endereço da função Wrapper.
+    - `start(entrada)` analisa e executa os comandos da entrada.
+        - `entrada`: Entrada dos comandos em String.
+    - `initLoop()`: inicia o loop interativo que le da entrada padrao.
 
 
 ## MACROS principais
@@ -141,10 +178,14 @@ Regras observaveis no lexer e no parser:
     - `CS_LONG` long
     - `CS_UNSIGNED_LONG` unsigned long
 
+> Obs: As Macros de funções e argumentos, vão possuir a versão em C e C++, definidos pelo prefixo `C_` e `CPP_`, respectivamente.
+
 ## Organizacao
 
-- `include/`: cabecalhos publicos e estruturas da biblioteca.
-- `src/`: implementacoes do lexer, parser, argumentos, funcoes e shell.
-- `Makefile`: compilacao dos arquivos C e empacotamento dos objetos.
-
-> *README.md gerado por IA*
+- `c/`: diretorios do porte em C
+    - `include/`: cabecalhos publicos e estruturas da biblioteca.
+    - `src/`: implementacoes do lexer, parser, argumentos, funcoes e shell.
+- `cpp/`: diretorios do porte em C++.
+    - `include/`: ...
+    - `src/`: ...
+- `Makefile`: compilacao dos arquivos C/C++ e empacotamento dos objetos.

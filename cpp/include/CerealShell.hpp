@@ -25,7 +25,7 @@ namespace cs
 
             WrapperFunction* getFunction(const std::string& name);
             bool newFunction(std::string name, WrapperFunction f);
-            cs::PStatus CerealShell_start(std::string input);
+            cs::PStatus start(std::string input);
             void initLoop();
     };
 };
