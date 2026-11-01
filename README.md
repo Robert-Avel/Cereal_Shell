@@ -56,8 +56,8 @@ C_FUNCTION_NEW(
     LONG,
     2,
     (c0, c1),
-    C_ARG_ASSEMBLY(0, LONG)
-    C_ARG_ASSEMBLY(1, LONG)
+    C_ARG_ASSEMBLY_POS(0, LONG)
+    C_ARG_ASSEMBLY_POS(1, LONG)
 )
 
 int main(void)
@@ -92,15 +92,15 @@ CPP_FUNCTION_NEW(
     LONG,
     2,
     (c0, c1),
-    CPP_ARG_ASSEMBLY(0, LONG)
-    CPP_ARG_ASSEMBLY(1, LONG)
+    CPP_ARG_ASSEMBLY_POS(0, LONG)
+    CPP_ARG_ASSEMBLY_POS(1, LONG)
 )
 
 int main(void)
 {
     cs::CerealShell cs;
 
-    cs.newFunction("printOk", soma__outCShell);
+    cs.newFunction("soma", soma__outCShell);
 
     cs.start("soma 20 22;");
     return 0;
