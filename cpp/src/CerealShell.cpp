@@ -86,6 +86,7 @@ void cs::CerealShell::initLoop() {
         printf(FG_BLUE CEREAL_INPUT_HEAD RESET);
         std::getline(std::cin, in);
 
+        if(in == "quit") {break;}
         auto end = this->start(in);
         if(end != cs::SUCCESS) {printError(end);}
     }
